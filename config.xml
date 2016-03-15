@@ -1,0 +1,18 @@
+<service>
+	<serviceName>martinoticias</serviceName>
+	<serviceDescription>Description of the service. What the service does?</serviceDescription>
+	<creatorEmail>libbie1996@gmail.com</creatorEmail>
+	<!--serviceCategory: negocios,ocio,academico,social,comunicaciones,informativo,adulto,otros-->
+	<serviceCategory>otros</serviceCategory>
+	<serviceUsage>
+		<![CDATA[
+			Escriba un nuevo email a {APRETASTE_EMAIL} y en el asunto ponga la palabra martinoticias
+
+			Por ejemplo:
+			Para: {APRETASTE_EMAIL}
+			Asunto: martinoticias
+
+			Recibir&aacute; un email con noticias del sitio martinoticias.
+		]]>
+	</serviceUsage>
+</service>
