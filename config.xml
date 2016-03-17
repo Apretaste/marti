@@ -1,18 +1,17 @@
 <service>
-	<serviceName>martinoticias</serviceName>
-	<serviceDescription>Description of the service. What the service does?</serviceDescription>
+	<serviceName>marti</serviceName>
+	<serviceDescription>Muestra los titulares de Marti Noticias y permite leer las noticias</serviceDescription>
 	<creatorEmail>libbie1996@gmail.com</creatorEmail>
-	<!--serviceCategory: negocios,ocio,academico,social,comunicaciones,informativo,adulto,otros-->
-	<serviceCategory>otros</serviceCategory>
+	<serviceCategory>informativo</serviceCategory>
 	<serviceUsage>
 		<![CDATA[
-			Escriba un nuevo email a {APRETASTE_EMAIL} y en el asunto ponga la palabra martinoticias
+			Escriba un nuevo email a {APRETASTE_EMAIL} y en el asunto ponga la palabra marti
 
 			Por ejemplo:
 			Para: {APRETASTE_EMAIL}
-			Asunto: martinoticias
+			Asunto: marti
 
-			Recibir&aacute; un email con noticias del sitio martinoticias.
+			Recibir&aacute; un email con los titulares del periodico Marti Noticias, desde el cual puede leer las noticias.
 		]]>
 	</serviceUsage>
 </service>
