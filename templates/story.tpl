@@ -7,7 +7,7 @@
 {/if}
 
 {section name=content loop=$content}
- 	<p>{$content[content]}</p>
+	<p>{$content[content]}</p>
 {/section}
 
 <center>

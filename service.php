@@ -80,9 +80,17 @@
 
 			// send the actual response
 			$responseContent = $this->story($request->query);
+
+			// get the image if exist
+			$images = array();
+			if( ! empty($responseContent['img']))
+			{
+				$images = array($responseContent['img']);
+			}
+
 			$response = new Response();
 			$response->setResponseSubject(str_replace("-", " ", ucfirst($pieces[1])));
-			$response->createFromTemplate("story.tpl", $responseContent);
+			$response->createFromTemplate("story.tpl", $responseContent, $images);
 			return $response;
 		}
 
@@ -307,36 +315,44 @@
 			// create a crawler
 			$crawler = $client->request('GET', "http://www.martinoticias.com/$query");
 
-			// search for result
+			// search for title
 			if ($crawler->filter('#article h1')->count() != 0)
 			{
 				$title = $crawler->filter('#article h1')->text();
 			}
 
+			// get the intro
 			if ($crawler->filter('#article .article_txt_intro')->count() != 0)
 			{
 				$intro = $crawler->filter('#article .article_txt_intro')->text();
 			}
 
+			// get the images
+			$imgUrl = ""; $imgAlt = "";
 			if ($crawler->filter('#article .contentImage img')->count() != 0)
 			{
-				$imgUrl = $crawler->filter('#article .contentImage img')->attr("src");
-				$imgAlt = $crawler->filter('#article .contentImage img')->attr("alt");
+				$imgUrl = trim($crawler->filter('#article .contentImage img')->attr("src"));
+				$imgAlt = trim($crawler->filter('#article .contentImage img')->attr("alt"));
+
+				// get the image
+				if ( ! empty($imgUrl))
+				{
+					$imgName = $this->utils->generateRandomHash() . "." . pathinfo($imgUrl, PATHINFO_EXTENSION);
+					$img = \Phalcon\DI\FactoryDefault::getDefault()->get('path')['root'] . "/temp/$imgName";
+					file_put_contents($img, file_get_contents($imgUrl));
+					$this->utils->optimizeImage($img, 300);
+				}
 			}
 
-			if ($crawler->filter('#article .articleContent .zoomMe p')->count() != 0)
+			// get the array of paragraphs of the body
+			$paragraphs = $crawler->filter('#article .articleContent .zoomMe p');
+			$content = array();
+			if ($paragraphs->count() > 0)
 			{
-				$content = $crawler->filter('#article .articleContent .zoomMe p')->each(function($content, $i) {
-					return $content->text();
-				});;
-			}
-
-			if (isset($imgUrl))
-			{
-				$imgName = $this->utils->generateRandomHash() . "." . basename($imgUrl); //explode(".", explode("/", trim($imgUrl))[count(explode("/", trim($imgUrl))) - 1])[count(explode(".", explode("/", trim($imgUrl))[count(explode("/", trim($imgUrl))) - 1])) - 1];
-				$img = \Phalcon\DI\FactoryDefault::getDefault()->get('path')['root'] . "/temp/$imgName";
-				file_put_contents($img, file_get_contents($imgUrl));
-				$this->utils->optimizeImage($img, 300);
+				foreach ($paragraphs as $p)
+				{
+					$content[] = trim($p->textContent);
+				}
 			}
 
 			// create a json object to send to the template
