@@ -12,46 +12,35 @@
 		 * */
 		public function _main(Request $request)
 		{
-			if(empty($request->query)) {
-				$responseContent = $this->allStories($request->query);
+			$responseContent = $this->allStories($request->query);
+			$response = new Response();
+			$response->setResponseSubject("Noticias de hoy");
+			$response->createFromTemplate("allStories.tpl", $responseContent);
+			return $response;
+		}
+
+		/**
+		 * Call to show the news
+		 *
+		 * @param Request
+		 * @return Response
+		 * */
+		public function _buscar(Request $request)
+		{
+			// no allow blank entries
+			if (empty($request->query))
+			{
 				$response = new Response();
-				$response->setResponseSubject("Noticias de hoy");
-				$response->createFromTemplate("allStories.tpl", $responseContent);
+				$response->setResponseSubject("Busqueda en blanco");
+				$response->createFromText("Su busqueda parece estar en blanco, debe decirnos sobre que tema quiere leer");
 				return $response;
 			}
 
-			$normalizeChars = array('Ì'=>'I', 'Í'=>'I', 'Î'=>'I', 'Ï'=>'I', 'ì'=>'i', 'í'=>'i', 'î'=>'i', 'î'=>'i', 'Î'=>'I');
-			if (explode(" ", strtoupper(trim(strtr($request->query, $normalizeChars))))[0] == "CATEGORIA") {
-				if (!isset(explode(" ", (trim($request->query)))[1])) {
-					$responseContent = array("chicken" => "filthy");
-					$response = new Response();
-					$response->setResponseSubject("Error Categoría");
-					$response->createFromTemplate("emptyCat.tpl", $responseContent);
-					return $response;
-				}
-
-				$responseContent = $this->listArticles($request->query);
-				$response = new Response();
-				$response->setResponseSubject($request->query);
-				$response->createFromTemplate("catArticles.tpl", $responseContent);
-				return $response;
-			}
-
-			if (explode(" ", strtoupper(trim($request->query)))[0] == "BUSCAR") {
-				if (!isset(explode(" ", (trim($request->query)))[1])) {
-					$responseContent = array("chicken" => "filthy");
-					$response = new Response();
-					$response->setResponseSubject("Error De Búsqueda");
-					$response->createFromTemplate("emptySearch.tpl", $responseContent);
-					return $response;
-				}
-
-				$responseContent = $this->searchArticles($request->query, $request->body);
-				$response = new Response();
-				$response->setResponseSubject($request->query);
-				$response->createFromTemplate("searchArticles.tpl", $responseContent);
-				return $response;
-			}
+			$responseContent = $this->searchArticles($request->query, $request->body);
+			$response = new Response();
+			$response->setResponseSubject($request->query);
+			$response->createFromTemplate("searchArticles.tpl", $responseContent);
+			return $response;
 		}
 
 		/**
@@ -74,22 +63,41 @@
 			// get the pieces 
 			$pieces = explode("/", $request->query);
 
-			// check media queries @TODO never show them in first place
-			if (strtoupper($pieces[0]) == "MEDIA")
-			{
-				$response = new Response();
-				$response->setResponseSubject("Material no disponible");
-				$response->createFromText("Lo siento, pero esta p&aacute;gina solamente contiene videos y fotos. Por limitaciones de capacidad, no podemos mandar archivos extensos por ahora");
-				return $response;
-			}
+
 
 			// send the actual response
 			$responseContent = $this->story($request->query);
 			$response = new Response();
-			$response->setResponseSubject(str_replace("-", " ", $pieces[1]));
+			$response->setResponseSubject(str_replace("-", " ", ucfirst($pieces[1])));
 			$response->createFromTemplate("story.tpl", $responseContent);
 			return $response;
+		}
 
+		/**
+		 * Call list by categoria
+		 *
+		 * @param Request
+		 * @return Response
+		 * */
+		public function _categoria(Request $request)
+		{
+			if (empty($request->query))
+			{
+				$response = new Response();
+				$response->setResponseSubject("Categoria en blanco");
+				$response->createFromText("Su busqueda parece estar en blanco, debe decirnos sobre que categor&iacute;a desea leer");
+				return $response;
+			}
+
+			$responseContent = array(
+				"articles" => $this->listArticles($request->query)["articles"],
+				"category" => $request->query
+			);
+
+			$response = new Response();
+			$response->setResponseSubject("Categoria: ".$request->query);
+			$response->createFromTemplate("catArticles.tpl", $responseContent);
+			return $response;
 		}
 
 		private function searchArticles($query)
@@ -172,34 +180,37 @@
 				'rows'      => $rowLimit,
 				'more'      => $apiUrl . "&startrow=0&rowlimit=$newLimit&searchtype=all&keywords=$query&zone=allzones&order=date"
 			);
+
 			return $responseContent;
 		}
 
-		private function listArticles($query) {
+		/**
+		 * Get the array of news by content
+		 */
+		private function listArticles($query)
+		{
 			// Setup client
 			$client = new Client();
 
 			// Setup crawler
 			$crawler = $client->request('GET', "http://www.martinoticias.com/api/epiqq");
 
-			// Keep integral part of query
-			$query = explode(" ", $query);
-			array_shift($query);
-			$query = implode(" ", $query);
-
 			// Collect articles by category
 			$articles = array();
-
-			$crawler->filter('channel item')->each(function($item, $i) use (&$articles, $query) {
-				//If category matches, add to list of articles
-				$item->filter('category')->each(function($cat, $i) use (&$articles, $query, $item) {
-					if (strtoupper($cat->text()) == strtoupper($query)) {
+			$crawler->filter('channel item')->each(function($item, $i) use (&$articles, $query)
+			{
+				// if category matches, add to list of articles
+				$item->filter('category')->each(function($cat, $i) use (&$articles, $query, $item)
+				{
+					if (strtoupper($cat->text()) == strtoupper($query))
+					{
 						$title = $item->filter('title')->text();
-						$link = $this->utils->getLinkToService("MARTINOTICIAS", "HISTORIA {$this->urlSplit($item->filter('link')->text())}");
+						$link = $this->urlSplit($item->filter('link')->text());
 						$pubDate = $item->filter('pubDate')->text();
 						$description = $item->filter('description')->text();
 						$author = "desconocido";
-						if ($item->filter('author')->count() > 0) {
+						if ($item->filter('author')->count() > 0)
+						{
 							$authorString = explode(" ", trim($item->filter('author')->text()));
 							$author = substr($authorString[1], 1, strpos($authorString[1], ")") - 1) . " ({$authorString[0]})";
 						}
@@ -216,10 +227,7 @@
 			});
 
 			// Return response content
-			$responseContent = array(
-				"articles" => $articles
-			);
-			return $responseContent;
+			return array("articles" => $articles);
 		}
 
 		/**
@@ -236,38 +244,43 @@
 			$crawler = $client->request('GET', "http://www.martinoticias.com/api/epiqq");
 
 			$articles = array();
-			$crawler->filter('item')->each(function($item, $i) use (&$articles) {
-				if ($item->filter('category')->text() != "Fotogalerías") {
-					$title = $item->filter('title')->text();
-					$description = $item->filter('description')->text();
-					$link = $this->urlSplit($item->filter('link')->text());
-					$pubDate = $item->filter('pubDate')->text();
-					$category = $item->filter('category')->each(function($category, $j) {
-						return $category->text();
-					});
+			$crawler->filter('item')->each(function($item, $i) use (&$articles)
+			{
+				// get the link to the story
+				$link = $this->urlSplit($item->filter('link')->text());
 
-					if ($item->filter('author')->count() == 0) {
-						$author = "desconocido";
-					} else {
-						$authorString = explode(" ", trim($item->filter('author')->text()));
-						$author = substr($authorString[1], 1, strpos($authorString[1], ")") - 1) . " ({$authorString[0]})";
-					}
+				// do not show anything other than content
+				$pieces = explode("/", $link);
+				if (strtoupper($pieces[0]) != "CONTENT") return;
 
-					$categoryLink = array();
-					foreach ($category as $currCategory) {
-						$categoryLink[] = $currCategory;
-					}
+				// get all other parameters
+				$title = $item->filter('title')->text();
+				$description = $item->filter('description')->text();
+				$pubDate = $item->filter('pubDate')->text();
+				$category = $item->filter('category')->each(function($category, $j) {return $category->text();});
 
-					$articles[] = array(
-						"title"        => $title,
-						"link"         => $link,
-						"pubDate"      => $pubDate,
-						"description"  => $description,
-						"category"     => $category,
-						"categoryLink" => $categoryLink,
-						"author"       => $author
-					);
+				if ($item->filter('author')->count() == 0) $author = "desconocido";
+				else
+				{
+					$authorString = explode(" ", trim($item->filter('author')->text()));
+					$author = substr($authorString[1], 1, strpos($authorString[1], ")") - 1) . " ({$authorString[0]})";
 				}
+
+				$categoryLink = array();
+				foreach ($category as $currCategory)
+				{
+					$categoryLink[] = $currCategory;
+				}
+
+				$articles[] = array(
+					"title"        => $title,
+					"link"         => $link,
+					"pubDate"      => $pubDate,
+					"description"  => $description,
+					"category"     => $category,
+					"categoryLink" => $categoryLink,
+					"author"       => $author
+				);
 			});
 
 			// return response content
@@ -330,8 +343,12 @@
 			);
 		}
 
-		// http://www.martinoticias.com/content/blah
-		private function urlSplit($url) {
+		/**
+		 * Get the link to the news starting from the /content part
+		 * http://www.martinoticias.com/content/blah
+		 */
+		private function urlSplit($url)
+		{
 			$url = explode("/", trim($url));
 			unset($url[0]);
 			unset($url[1]);
