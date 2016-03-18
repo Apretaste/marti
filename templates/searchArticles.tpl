@@ -1,4 +1,4 @@
-<h1>Categoria: {$category|ucfirst}</h1>
+<h1>Buscar: {$search|ucfirst}</h1>
 
 {foreach from=$articles item=article name=arts}
 	<b>{link href="MARTI HISTORIA {$article['link']}" caption="{$article['title']}"}</b><br/>

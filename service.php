@@ -35,9 +35,21 @@
 				return $response;
 			}
 
+			// search by the query
+			$articles = $this->searchArticles($request->query)["articles"];
+
+			// error if the searche return empty
+			if(empty($articles))
+			{
+				$response = new Response();
+				$response->setResponseSubject("Su busqueda no genero resultados");
+				$response->createFromText("Su busqueda <b>{$request->query}</b> no gener&oacute; ning&uacute;n resultado. Por favor cambie los t&eacute;rminos de b&uacute;squeda e intente nuevamente.");
+				return $response;
+			}
+			
 			$responseContent = array(
-				"articles" => $this->searchArticles($request->query)["articles"],
-				"category" => $request->query
+				"articles" => $articles,
+				"search" => $request->query
 			);
 
 			$response = new Response();
