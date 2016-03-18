@@ -9,7 +9,7 @@
 		<br/>
 		Categor&iacute;as: 
 		{foreach from=$article['category'] item=category name=cats}
-			{link href="MARTI CATEGORIA {$category['link']}" caption="{$category['name']}"} 
+			{link href="MARTI CATEGORIA {$category}" caption="{$category}"} 
 			{if not $smarty.foreach.cats.last}{separator}{/if}
 		{/foreach}
 	</small>

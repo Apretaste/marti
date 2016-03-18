@@ -123,6 +123,7 @@
 		{
 			// Fetch json data from search API
 			$rowLimit = 20;
+			$query = urlencode($query);
 			$apiUrl = "http://www.martinoticias.com/post.api?";
 			$apiData = file_get_contents($apiUrl . "&startrow=0&rowlimit=$rowLimit&searchtype=all&keywords=$query&zone=allzones&order=date");
 			$jsonData = json_decode($apiData, true);
@@ -149,18 +150,15 @@
 				if (strlen(trim($author)) < 1) $author = "desconcido";
 
 				// Generate link for story api
-				$link = implode("/", array("content", $data['searchArticleSlug'], $data['searchArticleID'])) . ".html";
-				$link = $this->utils->getLinkToService("MARTINOTICIAS", "HISTORIA $link");
+				$link = implode("/", array("content", $data['searchArticleSlug'], $data['searchArticleID'])) . ".htmlx";
 
+				// get the list of categories
 				foreach (explode(";", $data['searchArticleZone']) as $cat)
 				{
-					$categories[] = array(
-						'name' => $cat,
-						'link' => $this->utils->getLinkToService("MARTINOTICIAS", "CATEGORIA $cat")
-					);
+					$categories[] = $cat;
 				}
 
-				// Store list of articles
+				// store list of articles
 				$articles[] = array(
 					'pubDate'      => $data['searchArticlePubDate'],
 					'description'  => $data['HitHighlightedSummary'],
