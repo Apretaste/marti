@@ -9,3 +9,7 @@
 {section name=content loop=$content}
  	<p>{$content[content]}</p>
 {/section}
+
+<center>
+	{button href="MARTI" caption="M&aacute;s noticias"}
+</center>

@@ -12,10 +12,9 @@
 		 * */
 		public function _main(Request $request)
 		{
-			$responseContent = $this->allStories($request->query);
 			$response = new Response();
 			$response->setResponseSubject("Noticias de hoy");
-			$response->createFromTemplate("allStories.tpl", $responseContent);
+			$response->createFromTemplate("allStories.tpl", $this->allStories());
 			return $response;
 		}
 
@@ -32,13 +31,17 @@
 			{
 				$response = new Response();
 				$response->setResponseSubject("Busqueda en blanco");
-				$response->createFromText("Su busqueda parece estar en blanco, debe decirnos sobre que tema quiere leer");
+				$response->createFromText("Su busqueda parece estar en blanco, debe decirnos sobre que tema desea leer");
 				return $response;
 			}
 
-			$responseContent = $this->searchArticles($request->query, $request->body);
+			$responseContent = array(
+				"articles" => $this->searchArticles($request->query)["articles"],
+				"category" => $request->query
+			);
+
 			$response = new Response();
-			$response->setResponseSubject($request->query);
+			$response->setResponseSubject("Buscar: " . $request->query);
 			$response->createFromTemplate("searchArticles.tpl", $responseContent);
 			return $response;
 		}
@@ -58,12 +61,10 @@
 				$response->setResponseSubject("Busqueda en blanco");
 				$response->createFromText("Su busqueda parece estar en blanco, debe decirnos que articulo quiere leer");
 				return $response;
-			} 
+			}
 
 			// get the pieces 
 			$pieces = explode("/", $request->query);
-
-
 
 			// send the actual response
 			$responseContent = $this->story($request->query);
@@ -100,29 +101,17 @@
 			return $response;
 		}
 
+		/**
+		 * Search stories 
+		 * 
+		 * @param String
+		 * @return Array
+		 * */
 		private function searchArticles($query)
 		{
-			$apiUrl = "http://www.martinoticias.com/post.api?";
-
-			// Setup client
-			$client = new Client();
-
-			// Keep integral part of query
-			$query = explode(" ", $query);
-			array_shift($query);
-			$rowLimit = 20;
-
-			// Set starting row
-			if (count($query) > 1)
-				$rowLimit = array_shift($query);
-
-			// Limit amount of articles to return
-			if (count($query) > 1)
-				$increment = array_shift($query);
-
-			$query = urlencode(implode(" ", $query));
-
 			// Fetch json data from search API
+			$rowLimit = 20;
+			$apiUrl = "http://www.martinoticias.com/post.api?";
 			$apiData = file_get_contents($apiUrl . "&startrow=0&rowlimit=$rowLimit&searchtype=all&keywords=$query&zone=allzones&order=date");
 			$jsonData = json_decode($apiData, true);
 
@@ -135,9 +124,11 @@
 			$articles = array();
 
 			// Search through each row, fetch each cell, store as associative array.
-			foreach ($rows as $row) {
+			foreach ($rows as $row)
+			{
 				$categories = array();
-				foreach ($row['Cells']['results'] as $cell) {
+				foreach ($row['Cells']['results'] as $cell)
+				{
 					$data[$cell['Key']] = $cell['Value'];
 				}
 
@@ -146,13 +137,11 @@
 				if (strlen(trim($author)) < 1) $author = "desconcido";
 
 				// Generate link for story api
-				$link = implode("/",
-								array("content",
-									$data['searchArticleSlug'],
-									$data['searchArticleID'])
-								) . ".html";
+				$link = implode("/", array("content", $data['searchArticleSlug'], $data['searchArticleID'])) . ".html";
 				$link = $this->utils->getLinkToService("MARTINOTICIAS", "HISTORIA $link");
-				foreach (explode(";", $data['searchArticleZone']) as $cat) {
+
+				foreach (explode(";", $data['searchArticleZone']) as $cat)
+				{
 					$categories[] = array(
 						'name' => $cat,
 						'link' => $this->utils->getLinkToService("MARTINOTICIAS", "CATEGORIA $cat")
@@ -163,7 +152,6 @@
 				$articles[] = array(
 					'pubDate'      => $data['searchArticlePubDate'],
 					'description'  => $data['HitHighlightedSummary'],
-					//'category'     => explode(";", $data['searchArticleZone']),
 					'category'     => $categories,
 					'title'        => $data['searchArticleTitle'],
 					'tags'         => $data['searchArticleTag'],
@@ -173,12 +161,11 @@
 			}
 
 			// Return response content
-			$newLimit = $rowLimit + $increment;
 			$responseContent = array(
 				'articles'  => $articles,
 				'totalRows' => $totalRows,
 				'rows'      => $rowLimit,
-				'more'      => $apiUrl . "&startrow=0&rowlimit=$newLimit&searchtype=all&keywords=$query&zone=allzones&order=date"
+				'more'      => $apiUrl . "&startrow=0&rowlimit=$rowLimit&searchtype=all&keywords=$query&zone=allzones&order=date"
 			);
 
 			return $responseContent;
@@ -186,6 +173,9 @@
 
 		/**
 		 * Get the array of news by content
+		 * 
+		 * @param String
+		 * @return Array
 		 */
 		private function listArticles($query)
 		{
@@ -231,9 +221,12 @@
 		}
 
 		/**
-		 * Get all stories from a query 
+		 * Get all stories from a query
+		 * 
+		 * @return Array
 		 */
-		private function allStories($query) {
+		private function allStories()
+		{
 			// create a new client
 			$client = new Client();
 			$guzzle = $client->getClient();
@@ -289,6 +282,9 @@
 
 		/**
 		 * Get an specific news to display
+		 * 
+		 * @param String
+		 * @return Array
 		 */
 		private function story($query) 
 		{
@@ -345,6 +341,9 @@
 
 		/**
 		 * Get the link to the news starting from the /content part
+		 * 
+		 * @param String
+		 * @return String
 		 * http://www.martinoticias.com/content/blah
 		 */
 		private function urlSplit($url)
