@@ -2,7 +2,7 @@
 
 <p>{$intro}</p>
 
-{if isset($img)}
+{if not empty($img)}
 	{img src="{$img}" alt="{$imgAlt}" width="100%"}
 {/if}
 

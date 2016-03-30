@@ -328,7 +328,7 @@
 			}
 
 			// get the images
-			$imgUrl = ""; $imgAlt = "";
+			$imgUrl = ""; $imgAlt = ""; $img = "";
 			if ($crawler->filter('#article .contentImage img')->count() != 0)
 			{
 				$imgUrl = trim($crawler->filter('#article .contentImage img')->attr("src"));
