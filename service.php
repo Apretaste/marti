@@ -141,11 +141,15 @@
 			$articles = array();
 			$crawler->filter('.media-block .content')->each(function($item, $i) use (&$articles)
 			{
+				// only allow news, no media or gallery
+				if($item->filter('.ico')->count()>0) return;
+
+				// get data from each row
 				$date = $item->filter('.date')->text();
 				$title = $item->filter('.title')->text();
 				$description = $item->filter('a p')->text();
 				$link = $item->filter('a')->attr("href");
-				
+
 				// store list of articles
 				$articles[] = array(
 					"pubDate" => $date,
@@ -286,7 +290,8 @@
 			$title = $crawler->filter('.col-title h1')->text();
 
 			// get the intro
-			$intro = $crawler->filter('.intro p')->text();
+			$titleObj = $crawler->filter('.intro p');
+			$intro = $titleObj->count()>0 ? $titleObj->text() : "";
 
 			// get the images
 			$imageObj = $crawler->filter('.thumb img');

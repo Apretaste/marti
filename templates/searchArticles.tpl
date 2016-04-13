@@ -1,8 +1,8 @@
 <h1>Buscar: {$search|ucfirst}</h1>
 
 {foreach from=$articles item=article name=arts}
+	<small><font color="gray">{$article['pubDate']|date_format|capitalize}</font></small><br/>
 	<b>{link href="MARTI HISTORIA {$article['link']}" caption="{$article['title']}"}</b><br/>
-	{space5}
 	{$article['description']}<br/>
 	{space15}
 {/foreach}
