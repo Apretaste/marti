@@ -13,3 +13,9 @@
 	</small>
 	{space15}
 {/foreach}
+
+{space5}
+
+<center>
+	{button href="MARTI" caption="M&aacute;s noticias"}
+</center>

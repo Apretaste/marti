@@ -10,6 +10,9 @@
 	<p>{$content[content]}</p>
 {/section}
 
+{space5}
+
 <center>
 	{button href="MARTI" caption="M&aacute;s noticias"}
+	{button href="PIZARRA Miren esto: {$url}" caption="Compartir" color="grey"}
 </center>

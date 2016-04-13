@@ -1,5 +1,4 @@
 <?php
-
 	use Goutte\Client;
 
 	class Marti extends Service 
@@ -36,7 +35,7 @@
 			}
 
 			// search by the query
-			$articles = $this->searchArticles($request->query)["articles"];
+			$articles = $this->searchArticles($request->query);
 
 			// error if the searche return empty
 			if(empty($articles))
@@ -88,8 +87,12 @@
 				$images = array($responseContent['img']);
 			}
 
+			// subject chenges when user comes from the main menu or from buscar 
+			if(strlen($pieces[1]) > 5) $subject = str_replace("-", " ", ucfirst($pieces[1]));
+			else $subject = "La historia que pidio";
+
 			$response = new Response();
-			$response->setResponseSubject(str_replace("-", " ", ucfirst($pieces[1])));
+			$response->setResponseSubject($subject);
 			$response->createFromTemplate("story.tpl", $responseContent, $images);
 			return $response;
 		}
@@ -129,64 +132,30 @@
 		 * */
 		private function searchArticles($query)
 		{
-			// Fetch json data from search API
-			$rowLimit = 20;
-			$query = urlencode($query);
-			$apiUrl = "http://www.martinoticias.com/post.api?";
-			$apiData = file_get_contents($apiUrl . "&startrow=0&rowlimit=$rowLimit&searchtype=all&keywords=$query&zone=allzones&order=date");
-			$jsonData = json_decode($apiData, true);
+			// Setup crawler
+			$client = new Client();
+			$url = "http://www.martinoticias.com/s?k=".urlencode($query);
+			$crawler = $client->request('GET', $url);
 
-			// Fetch rows of data
-			$totalRows = $jsonData['d']['postquery']['PrimaryQueryResult']['RelevantResults']['TotalRows'];
-			$rows = $jsonData['d']['postquery']['PrimaryQueryResult']['RelevantResults']['Table']['Rows']['results'];
-
-			$data = array();
-			$i = 0;
+			// Collect saearch by category
 			$articles = array();
-
-			// Search through each row, fetch each cell, store as associative array.
-			foreach ($rows as $row)
+			$crawler->filter('.media-block .content')->each(function($item, $i) use (&$articles)
 			{
-				$categories = array();
-				foreach ($row['Cells']['results'] as $cell)
-				{
-					$data[$cell['Key']] = $cell['Value'];
-				}
-
-				// Get author, if none, show anonymous
-				$author = $data['searchArticleAuthor'];
-				if (strlen(trim($author)) < 1) $author = "desconcido";
-
-				// Generate link for story api
-				$link = implode("/", array("content", $data['searchArticleSlug'], $data['searchArticleID'])) . ".htmlx";
-
-				// get the list of categories
-				foreach (explode(";", $data['searchArticleZone']) as $cat)
-				{
-					$categories[] = $cat;
-				}
-
+				$date = $item->filter('.date')->text();
+				$title = $item->filter('.title')->text();
+				$description = $item->filter('a p')->text();
+				$link = $item->filter('a')->attr("href");
+				
 				// store list of articles
 				$articles[] = array(
-					'pubDate'      => $data['searchArticlePubDate'],
-					'description'  => $data['HitHighlightedSummary'],
-					'category'     => $categories,
-					'title'        => $data['searchArticleTitle'],
-					'tags'         => $data['searchArticleTag'],
-					'author'       => $author,
-					'link'         => $link
+					"pubDate" => $date,
+					"description" => $description,
+					"title"	=> $title,
+					"link" => $link
 				);
-			}
+			});
 
-			// Return response content
-			$responseContent = array(
-				'articles'  => $articles,
-				'totalRows' => $totalRows,
-				'rows'      => $rowLimit,
-				'more'      => $apiUrl . "&startrow=0&rowlimit=$rowLimit&searchtype=all&keywords=$query&zone=allzones&order=date"
-			);
-
-			return $responseContent;
+			return $articles;
 		}
 
 		/**
@@ -197,10 +166,8 @@
 		 */
 		private function listArticles($query)
 		{
-			// Setup client
-			$client = new Client();
-
 			// Setup crawler
+			$client = new Client();
 			$crawler = $client->request('GET', "http://www.martinoticias.com/api/epiqq");
 
 			// Collect articles by category
@@ -224,11 +191,11 @@
 						}
 
 						$articles[] = array(
-							"title"       => $title,
-							"link"        => $link,
-							"pubDate"     => $pubDate,
+							"title"	   => $title,
+							"link"		=> $link,
+							"pubDate"	 => $pubDate,
 							"description" => $description,
-							"author"      => $author
+							"author"	  => $author
 						);
 					}
 				});
@@ -262,7 +229,7 @@
 
 				// do not show anything other than content
 				$pieces = explode("/", $link);
-				if (strtoupper($pieces[0]) != "CONTENT") return;
+				if (strtoupper($pieces[0]) != "A") return;
 
 				// get all other parameters
 				$title = $item->filter('title')->text();
@@ -284,13 +251,13 @@
 				}
 
 				$articles[] = array(
-					"title"        => $title,
-					"link"         => $link,
-					"pubDate"      => $pubDate,
-					"description"  => $description,
-					"category"     => $category,
+					"title" => $title,
+					"link" => $link,
+					"pubDate" => $pubDate,
+					"description" => $description,
+					"category" => $category,
 					"categoryLink" => $categoryLink,
-					"author"       => $author
+					"author" => $author
 				);
 			});
 
@@ -316,23 +283,18 @@
 			$crawler = $client->request('GET', "http://www.martinoticias.com/$query");
 
 			// search for title
-			if ($crawler->filter('#article h1')->count() != 0)
-			{
-				$title = $crawler->filter('#article h1')->text();
-			}
+			$title = $crawler->filter('.col-title h1')->text();
 
 			// get the intro
-			if ($crawler->filter('#article .article_txt_intro')->count() != 0)
-			{
-				$intro = $crawler->filter('#article .article_txt_intro')->text();
-			}
+			$intro = $crawler->filter('.intro p')->text();
 
 			// get the images
+			$imageObj = $crawler->filter('.thumb img');
 			$imgUrl = ""; $imgAlt = ""; $img = "";
-			if ($crawler->filter('#article .contentImage img')->count() != 0)
+			if ($imageObj->count() != 0)
 			{
-				$imgUrl = trim($crawler->filter('#article .contentImage img')->attr("src"));
-				$imgAlt = trim($crawler->filter('#article .contentImage img')->attr("alt"));
+				$imgUrl = trim($imageObj->attr("src"));
+				$imgAlt = trim($imageObj->attr("alt"));
 
 				// get the image
 				if ( ! empty($imgUrl))
@@ -345,14 +307,11 @@
 			}
 
 			// get the array of paragraphs of the body
-			$paragraphs = $crawler->filter('#article .articleContent .zoomMe p');
+			$paragraphs = $crawler->filter('.wysiwyg p');
 			$content = array();
-			if ($paragraphs->count() > 0)
+			foreach ($paragraphs as $p)
 			{
-				foreach ($paragraphs as $p)
-				{
-					$content[] = trim($p->textContent);
-				}
+				$content[] = trim($p->textContent);
 			}
 
 			// create a json object to send to the template
@@ -361,7 +320,8 @@
 				"intro" => $intro,
 				"img" => $img,
 				"imgAlt" => $imgAlt,
-				"content" => $content
+				"content" => $content,
+				"url" => "http://www.martinoticias.com/$query"
 			);
 		}
 
