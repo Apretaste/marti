@@ -1,7 +1,7 @@
 <?php
 	use Goutte\Client;
 
-	class Marti extends Service 
+	class Marti extends Service
 	{
 		/**
 		 * Function executed when the service is called
@@ -35,7 +35,11 @@
 			}
 
 			// search by the query
-			$articles = $this->searchArticles($request->query);
+			try {
+				$articles = $this->searchArticles($request->query);
+			} catch (Exception $e) {
+				return $this->respondWithError();
+			}
 
 			// error if the searche return empty
 			if(empty($articles))
@@ -45,7 +49,7 @@
 				$response->createFromText("Su busqueda <b>{$request->query}</b> no gener&oacute; ning&uacute;n resultado. Por favor cambie los t&eacute;rminos de b&uacute;squeda e intente nuevamente.");
 				return $response;
 			}
-			
+
 			$responseContent = array(
 				"articles" => $articles,
 				"search" => $request->query
@@ -74,11 +78,15 @@
 				return $response;
 			}
 
-			// get the pieces 
+			// get the pieces
 			$pieces = explode("/", $request->query);
 
 			// send the actual response
-			$responseContent = $this->story($request->query);
+			try {
+				$responseContent = $this->story($request->query);
+			} catch (Exception $e) {
+				return $this->respondWithError();
+			}
 
 			// get the image if exist
 			$images = array();
@@ -87,7 +95,7 @@
 				$images = array($responseContent['img']);
 			}
 
-			// subject chenges when user comes from the main menu or from buscar 
+			// subject chenges when user comes from the main menu or from buscar
 			if(strlen($pieces[1]) > 5) $subject = str_replace("-", " ", ucfirst($pieces[1]));
 			else $subject = "La historia que pidio";
 
@@ -125,8 +133,8 @@
 		}
 
 		/**
-		 * Search stories 
-		 * 
+		 * Search stories
+		 *
 		 * @param String
 		 * @return Array
 		 * */
@@ -139,7 +147,7 @@
 
 			// Collect saearch by category
 			$articles = array();
-			$crawler->filter('.media-block .content')->each(function($item, $i) use (&$articles)
+			$crawler->filter('.media-block.with-date .content')->each(function($item, $i) use (&$articles)
 			{
 				// only allow news, no media or gallery
 				if($item->filter('.ico')->count()>0) return;
@@ -164,7 +172,7 @@
 
 		/**
 		 * Get the array of news by content
-		 * 
+		 *
 		 * @param String
 		 * @return Array
 		 */
@@ -195,11 +203,11 @@
 						}
 
 						$articles[] = array(
-							"title"	   => $title,
-							"link"		=> $link,
-							"pubDate"	 => $pubDate,
+							"title" => $title,
+							"link" => $link,
+							"pubDate" => $pubDate,
 							"description" => $description,
-							"author"	  => $author
+							"author" => $author
 						);
 					}
 				});
@@ -211,7 +219,7 @@
 
 		/**
 		 * Get all stories from a query
-		 * 
+		 *
 		 * @return Array
 		 */
 		private function allStories()
@@ -271,11 +279,11 @@
 
 		/**
 		 * Get an specific news to display
-		 * 
+		 *
 		 * @param String
 		 * @return Array
 		 */
-		private function story($query) 
+		private function story($query)
 		{
 			// create a new client
 			$client = new Client();
@@ -332,7 +340,7 @@
 
 		/**
 		 * Get the link to the news starting from the /content part
-		 * 
+		 *
 		 * @param String
 		 * @return String
 		 * http://www.martinoticias.com/content/blah
@@ -344,6 +352,20 @@
 			unset($url[1]);
 			unset($url[2]);
 			return implode("/", $url);
+		}
+
+		/**
+		 * Return a generic error email, usually for try..catch blocks
+		 *
+		 * @auhor salvipascual
+		 * @return Respose
+		 */
+		private function respondWithError()
+		{
+			$response = new Response();
+			$response->setResponseSubject("Error en peticion");
+			$response->createFromText("Lo siento pero no pudimos entender la peticion que esta haciendo. Por favor intente nuevamente.");
+			return $response;
 		}
 	}
 ?>
