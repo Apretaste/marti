@@ -355,16 +355,18 @@
 		}
 
 		/**
-		 * Return a generic error email, usually for try..catch blocks
+		 * Return a generic error email, usually for try...catch blocks
 		 *
 		 * @auhor salvipascual
 		 * @return Respose
 		 */
 		private function respondWithError()
 		{
+			error_log("WARNING: ERROR ON SERVICE MARTI");
+
 			$response = new Response();
 			$response->setResponseSubject("Error en peticion");
-			$response->createFromText("Lo siento pero no pudimos entender la peticion que esta haciendo. Por favor intente nuevamente.");
+			$response->createFromText("Lo siento pero hemos tenido un error inesperado. Enviamos una peticion para corregirlo. Por favor intente nuevamente mas tarde.");
 			return $response;
 		}
 	}
