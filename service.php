@@ -12,6 +12,7 @@
 		public function _main(Request $request)
 		{
 			$response = new Response();
+			$response->setEmailLayout('marti.tpl');
 			$response->setResponseSubject("Noticias de hoy");
 			$response->createFromTemplate("allStories.tpl", $this->allStories());
 			return $response;
