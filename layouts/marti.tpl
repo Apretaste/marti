@@ -56,8 +56,8 @@
 				<tr>
 					<td align="center" valign="middle">
 						<div style="color:white; font-size:42px; margin:15px 0px; font-weight:bold; font-family:Times;">
-							<span style="background-color:#24A6DE; padding:3px;">M<span>4</span>R<span>T</span>1</span>
-							<span style="padding:3px; background-color:#C50406;">N0<span>T1C</span>1AS</span>
+							<span style="background-color:#24A6DE; padding:3px;">MARTI</span>
+							<span style="padding:3px; background-color:#C50406;">NOTICIAS</span>
 						</div>
 					</td>
 				</tr>
