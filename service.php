@@ -30,6 +30,7 @@
 			if (empty($request->query))
 			{
 				$response = new Response();
+				$response->setEmailLayout('marti.tpl');
 				$response->setResponseSubject("Busqueda en blanco");
 				$response->createFromText("Su busqueda parece estar en blanco, debe decirnos sobre que tema desea leer");
 				return $response;
@@ -46,6 +47,7 @@
 			if(empty($articles))
 			{
 				$response = new Response();
+				$response->setEmailLayout('marti.tpl');
 				$response->setResponseSubject("Su busqueda no genero resultados");
 				$response->createFromText("Su busqueda <b>{$request->query}</b> no gener&oacute; ning&uacute;n resultado. Por favor cambie los t&eacute;rminos de b&uacute;squeda e intente nuevamente.");
 				return $response;
@@ -57,6 +59,7 @@
 			);
 
 			$response = new Response();
+			$response->setEmailLayout('marti.tpl');
 			$response->setResponseSubject("Buscar: " . $request->query);
 			$response->createFromTemplate("searchArticles.tpl", $responseContent);
 			return $response;
@@ -74,6 +77,7 @@
 			if (empty($request->query))
 			{
 				$response = new Response();
+				$response->setEmailLayout('marti.tpl');
 				$response->setResponseSubject("Busqueda en blanco");
 				$response->createFromText("Su busqueda parece estar en blanco, debe decirnos que articulo quiere leer");
 				return $response;
@@ -101,6 +105,7 @@
 			else $subject = "La historia que pidio";
 
 			$response = new Response();
+			$response->setEmailLayout('marti.tpl');
 			$response->setResponseSubject($subject);
 			$response->createFromTemplate("story.tpl", $responseContent, $images);
 			return $response;
@@ -117,6 +122,7 @@
 			if (empty($request->query))
 			{
 				$response = new Response();
+				$response->setEmailLayout('marti.tpl');
 				$response->setResponseSubject("Categoria en blanco");
 				$response->createFromText("Su busqueda parece estar en blanco, debe decirnos sobre que categor&iacute;a desea leer");
 				return $response;
@@ -128,6 +134,7 @@
 			);
 
 			$response = new Response();
+			$response->setEmailLayout('marti.tpl');
 			$response->setResponseSubject("Categoria: ".$request->query);
 			$response->createFromTemplate("catArticles.tpl", $responseContent);
 			return $response;
@@ -366,6 +373,7 @@
 			error_log("WARNING: ERROR ON SERVICE MARTI");
 
 			$response = new Response();
+			$response->setEmailLayout('marti.tpl');
 			$response->setResponseSubject("Error en peticion");
 			$response->createFromText("Lo siento pero hemos tenido un error inesperado. Enviamos una peticion para corregirlo. Por favor intente nuevamente mas tarde.");
 			return $response;
