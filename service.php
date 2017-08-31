@@ -12,6 +12,7 @@
 		public function _main(Request $request)
 		{
 			$response = new Response();
+			$response->setCache("day");
 			$response->setEmailLayout('marti.tpl');
 			$response->setResponseSubject("Noticias de hoy");
 			$response->createFromTemplate("allStories.tpl", $this->allStories());
@@ -30,6 +31,7 @@
 			if (empty($request->query))
 			{
 				$response = new Response();
+				$response->setCache();
 				$response->setEmailLayout('marti.tpl');
 				$response->setResponseSubject("Busqueda en blanco");
 				$response->createFromText("Su busqueda parece estar en blanco, debe decirnos sobre que tema desea leer");
@@ -77,6 +79,7 @@
 			if (empty($request->query))
 			{
 				$response = new Response();
+				$response->setCache();
 				$response->setEmailLayout('marti.tpl');
 				$response->setResponseSubject("Busqueda en blanco");
 				$response->createFromText("Su busqueda parece estar en blanco, debe decirnos que articulo quiere leer");
@@ -105,6 +108,7 @@
 			else $subject = "La historia que pidio";
 
 			$response = new Response();
+			$response->setCache();
 			$response->setEmailLayout('marti.tpl');
 			$response->setResponseSubject($subject);
 			$response->createFromTemplate("story.tpl", $responseContent, $images);
@@ -122,6 +126,7 @@
 			if (empty($request->query))
 			{
 				$response = new Response();
+				$response->setCache();
 				$response->setEmailLayout('marti.tpl');
 				$response->setResponseSubject("Categoria en blanco");
 				$response->createFromText("Su busqueda parece estar en blanco, debe decirnos sobre que categor&iacute;a desea leer");
