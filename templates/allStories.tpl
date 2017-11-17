@@ -8,7 +8,7 @@
 </table>
 
 {foreach from=$articles item=article name=arts}
-		<b>{link href="MARTI HISTORIA {$article['link']}" caption="{$article['title']}"}</b><br/>
+	<b>{link href="MARTI HISTORIA {$article['link']}" caption="{$article['title']}"}</b><br/>
 	{space5}
 	{$article['description']|truncate:200:" ..."}<br/>
 	<small>

@@ -14,5 +14,5 @@
 
 <center>
 	{button href="MARTI" caption="M&aacute;s noticias"}
-	{button href="PIZARRA Miren esto: {$url}" caption="Compartir" color="grey"}
+	{button href="PIZARRA Miren esto: {$url}" caption="Compartir" color="grey" wait="false"}
 </center>
