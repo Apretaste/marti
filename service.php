@@ -313,7 +313,7 @@
 			$intro = $titleObj->count()>0 ? $titleObj->text() : "";
 
 			// get the images
-			$imageObj = $crawler->filter('.thumb img');
+			$imageObj = $crawler->filter('figure.media-image img');
 			$imgUrl = ""; $imgAlt = ""; $img = "";
 			if ($imageObj->count() != 0)
 			{
@@ -330,7 +330,7 @@
 			}
 
 			// get the array of paragraphs of the body
-			$paragraphs = $crawler->filter('.wysiwyg p');
+			$paragraphs = $crawler->filter('div.wsw p:not(.ta-c)');
 			$content = array();
 			foreach ($paragraphs as $p)
 			{
