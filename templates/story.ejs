@@ -1,0 +1,25 @@
+<div class="row">
+	<div class="col s12">
+		<h1><%=title%></h1>
+
+		<p><%=intro%></p>
+		
+		<%if(img!=""){%>
+			  <div class="center-align">	
+				  	<img class="responsive-img materialboxed" src="{{APP_IMAGE_PATH}}/<%=img%>" alt="<%=imgAlt%>">
+				</div>
+		<%}%>
+		
+
+		<section>
+			<% content.forEach(parrafo=>{%>
+			<p style="text-align:justify;"><%=parrafo%></p>
+		<%});%>
+		</section>
+		
+		<div class="center-align">
+			<button class="waves-effect waves-light btn" onclick="apretaste.send({'command':'MARTI'})">Más Noticias</button>
+			<button class="waves-effect waves-light btn" onclick="apretaste.send({'command':'PIZARRA ESCRIBIR','redirect':false,'data':{'nota':'<%=url%>'}})">Compartir</button>
+		</div>
+	</div>
+</div>

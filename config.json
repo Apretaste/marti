@@ -1,0 +1,8 @@
+{
+	"name":"marti",
+	"version":"1",
+	"description":"Muestra los titulares de Marti Noticias y permite leer las noticias publicadas",
+	"category":"informativo",
+	"creator":"salvi@apretaste.com",
+	"listed":true
+}

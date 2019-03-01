@@ -1,7 +1,7 @@
 <?php
 	use Goutte\Client;
 
-	class Marti extends Service
+	class Service
 	{
 		/**
 		 * Function executed when the service is called
@@ -9,14 +9,14 @@
 		 * @param Request
 		 * @return Response
 		 * */
-		public function _main(Request $request)
+		public function _main(Request $request, Response $response)
 		{
-			$response = new Response();
+			
 			$response->setCache("day");
-			$response->setEmailLayout('marti.tpl');
-			$response->setResponseSubject("Noticias de hoy");
-			$response->createFromTemplate("allStories.tpl", $this->allStories());
-			return $response;
+			//$response->setLayout('marti.tpl');allStories
+			//die(var_dump($this->allStories()));
+			$response->setTemplate("allStories.ejs", $this->allStories());
+			
 		}
 
 		/**
@@ -25,46 +25,46 @@
 		 * @param Request
 		 * @return Response
 		 * */
-		public function _buscar(Request $request)
+		public function _buscar(Request $request, Response $response)
 		{
+			$buscar = $request->input->data->searchQuery;
+			$isCategory = $request->input->data->isCategory;
+			
 			// no allow blank entries
-			if (empty($request->query))
-			{
-				$response = new Response();
-				$response->setCache();
-				$response->setEmailLayout('marti.tpl');
-				$response->setResponseSubject("Busqueda en blanco");
-				$response->createFromText("Su busqueda parece estar en blanco, debe decirnos sobre que tema desea leer");
-				return $response;
-			}
+			if(empty($buscar)){
+			//$response->setLayout('Marti.ejs');
+			$response->setTemplate('text.ejs', [
+				"title" => "Su busqueda parece estar en blanco",
+				"body" => "debe decirnos sobre que tema desea leer"
+			]);
 
+			return;
+		}
 			// search by the query
-			try {
-				$articles = $this->searchArticles($request->query);
-			} catch (Exception $e) {
-				return $this->respondWithError();
-			}
+			$articles = $this->searchArticles($buscar);
 
 			// error if the searche return empty
 			if(empty($articles))
-			{
-				$response = new Response();
-				$response->setEmailLayout('marti.tpl');
-				$response->setResponseSubject("Su busqueda no genero resultados");
-				$response->createFromText("Su busqueda <b>{$request->query}</b> no gener&oacute; ning&uacute;n resultado. Por favor cambie los t&eacute;rminos de b&uacute;squeda e intente nuevamente.");
-				return $response;
-			}
+		{
 
-			$responseContent = array(
-				"articles" => $articles,
-				"search" => $request->query
-			);
+			//$response->setLayout('marti.ejs');
+			$response->setTemplate("text.ejs", [
+				"title" => "Su busqueda parece estar en blanco",
+				"body" => html_entity_decode("Su busqueda no gener&oacute; ning&uacute;n resultado. Por favor cambie los t&eacute;rminos de b&uacute;squeda e intente nuevamente.")
+			]);
 
-			$response = new Response();
-			$response->setEmailLayout('marti.tpl');
-			$response->setResponseSubject("Buscar: " . $request->query);
-			$response->createFromTemplate("searchArticles.tpl", $responseContent);
-			return $response;
+			return;
+		}
+        
+		$responseContent = [
+			"articles" => $articles,
+			"search" => $isCategory ? "Categoria: $buscar" : "Buscar: $buscar"
+		];
+
+		$response->setLayout('marti.ejs');
+		$response->setTemplate("searchArticles.ejs", $responseContent);
+	
+			
 		}
 
 		/**
@@ -73,28 +73,17 @@
 		 * @param Request
 		 * @return Response
 		 * */
-		public function _historia(Request $request)
-		{
-			// no allow blank entries
-			if (empty($request->query))
-			{
-				$response = new Response();
-				$response->setCache();
-				$response->setEmailLayout('marti.tpl');
-				$response->setResponseSubject("Busqueda en blanco");
-				$response->createFromText("Su busqueda parece estar en blanco, debe decirnos que articulo quiere leer");
-				return $response;
-			}
+		public function _historia(Request $request, Response $response)
+		{ 
+			$history=$request->input->data->historia;
 
 			// get the pieces
-			$pieces = explode("/", $request->query);
+			$pieces = explode("/", $history);
 
 			// send the actual response
-			try {
-				$responseContent = $this->story($request->query);
-			} catch (Exception $e) {
-				return $this->respondWithError();
-			}
+			
+			$responseContent = $this->story($history);
+			
 
 			// get the image if exist
 			$images = array();
@@ -107,11 +96,10 @@
 			if(strlen($pieces[1]) > 5) $subject = str_replace("-", " ", ucfirst($pieces[1]));
 			else $subject = "La historia que pidio";
 
-			$response = new Response();
+			
 			$response->setCache();
-			$response->setEmailLayout('marti.tpl');
-			$response->setResponseSubject($subject);
-			$response->createFromTemplate("story.tpl", $responseContent, $images);
+//			$response->setEmailLayout('marti.tpl');
+			$response->setTemplate("story.ejs", $responseContent, $images);
 			return $response;
 		}
 
@@ -121,14 +109,13 @@
 		 * @param Request
 		 * @return Response
 		 * */
-		public function _categoria(Request $request)
+		public function _categoria(Request $request, Response $response)
 		{
 			if (empty($request->query))
 			{
-				$response = new Response();
+				
 				$response->setCache();
-				$response->setEmailLayout('marti.tpl');
-				$response->setResponseSubject("Categoria en blanco");
+				$response->setLayout('marti.tpl');
 				$response->createFromText("Su busqueda parece estar en blanco, debe decirnos sobre que categor&iacute;a desea leer");
 				return $response;
 			}
@@ -138,10 +125,9 @@
 				"category" => $request->query
 			);
 
-			$response = new Response();
+			
 			$response->setEmailLayout('marti.tpl');
-			$response->setResponseSubject("Categoria: ".$request->query);
-			$response->createFromTemplate("catArticles.tpl", $responseContent);
+			$response->setTemplate("catArticles.tpl", $responseContent);
 			return $response;
 		}
 
@@ -155,20 +141,17 @@
 		{
 			// Setup crawler
 			$client = new Client();
-			$url = "http://www.martinoticias.com/s?k=".urlencode($query);
+			$url = "http://www.martinoticias.com/s?k=".urlencode($query)."&tab=news&pi=1&r=any&pp=50";
 			$crawler = $client->request('GET', $url);
-
 			// Collect saearch by category
 			$articles = array();
-			$crawler->filter('.media-block.with-date .content')->each(function($item, $i) use (&$articles)
+			$crawler->filter('.row > .small-thums-list.follow-up-list > li')->each(function($item, $i) use (&$articles)
 			{
-				// only allow news, no media or gallery
-				if($item->filter('.ico')->count()>0) return;
-
+				//if($item->filter('.date')->count()==0) die($item->html());
 				// get data from each row
 				$date = $item->filter('.date')->text();
-				$title = $item->filter('.title')->text();
-				$description = $item->filter('a p')->text();
+				$title = $item->filter('.media-block__title')->text();
+				$description = $item->filter('a p')->count()>0 ? $item->filter('a p')->text():"";
 				$link = $item->filter('a')->attr("href");
 
 				// store list of articles
@@ -259,30 +242,32 @@
 				$title = $item->filter('title')->text();
 				$description = $item->filter('description')->text();
 				$pubDate = $item->filter('pubDate')->text();
-				$category = $item->filter('category')->each(function($category, $j) {return $category->text();});
+				
+				$category = array();
+				$item->filter('category')->each(function($cate) use(&$category) {
+					if ($cate->text()!="Titulares" && !in_array($cate->text(),$category)) $category[]= $cate->text();
+				});
 
-				if ($item->filter('author')->count() == 0) $author = "desconocido";
+				if ($item->filter('author')->count() == 0) $author = "";
 				else
 				{
-					$authorString = explode(" ", trim($item->filter('author')->text()));
-					$author = substr($authorString[1], 1, strpos($authorString[1], ")") - 1) . " ({$authorString[0]})";
+					$author = trim($item->filter('author')->text());
+                    $author = str_replace(['(',')'],'',substr($author, strpos($author, "(")));
 				}
 
 				$categoryLink = array();
-				foreach ($category as $currCategory)
-				{
-					$categoryLink[] = $currCategory;
-				}
+				foreach ($category as $currCategory) $categoryLink[] = $currCategory;
 
-				$articles[] = array(
-					"title" => $title,
-					"link" => $link,
-					"pubDate" => $pubDate,
-					"description" => $description,
-					"category" => $category,
-					"categoryLink" => $categoryLink,
-					"author" => $author
-				);
+				if(count(array_intersect(["OCB Direct Packages", "OCB Direct Programs"], $category))==0)
+					$articles[] = array(
+						"title" => $title,
+						"link" => $link,
+						"pubDate" => $pubDate,
+						"description" => $description,
+						"category" => $category,
+						"categoryLink" => $categoryLink,
+						"author" => $author
+					);
 			});
 
 			// return response content
@@ -306,7 +291,7 @@
 			$crawler = $client->request('GET', "http://www.martinoticias.com/$query");
 
 			// search for title
-			$title = $crawler->filter('.col-title h1')->text();
+			$title = $crawler->filter('.col-title h1, h1.title')->text();
 
 			// get the intro
 			$titleObj = $crawler->filter('.intro p');
@@ -323,7 +308,7 @@
 				// get the image
 				if ( ! empty($imgUrl))
 				{
-					$imgName = $this->utils->generateRandomHash() . "." . pathinfo($imgUrl, PATHINFO_EXTENSION);
+					$imgName = Utils::generateRandomHash() . "." . pathinfo($imgUrl, PATHINFO_EXTENSION);
 					$img = \Phalcon\DI\FactoryDefault::getDefault()->get('path')['root'] . "/temp/$imgName";
 					file_put_contents($img, file_get_contents($imgUrl));
 				}
@@ -370,15 +355,6 @@
 		 * @auhor salvipascual
 		 * @return Respose
 		 */
-		private function respondWithError()
-		{
-			error_log("WARNING: ERROR ON SERVICE MARTI");
-
-			$response = new Response();
-			$response->setEmailLayout('marti.tpl');
-			$response->setResponseSubject("Error en peticion");
-			$response->createFromText("Lo siento pero hemos tenido un error inesperado. Enviamos una peticion para corregirlo. Por favor intente nuevamente mas tarde.");
-			return $response;
-		}
+		
 	}
 ?>

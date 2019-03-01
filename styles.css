@@ -1,0 +1,8 @@
+.materialboxed{
+    display: inline;
+}
+.chip.small{
+    height: 20px;
+    line-height: 20px;
+    padding: 0 8px;
+}

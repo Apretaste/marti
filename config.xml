@@ -1,6 +1,0 @@
-<service>
-	<serviceName>marti</serviceName>
-	<serviceDescription>Muestra los titulares de Marti Noticias y permite leer las noticias</serviceDescription>
-	<creatorEmail>libbie1996@gmail.com</creatorEmail>
-	<serviceCategory>informativo</serviceCategory>
-</service>
