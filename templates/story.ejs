@@ -6,14 +6,14 @@
 		
 		<%if(img!=""){%>
 			  <div class="center-align">	
-				  	<img class="responsive-img materialboxed" src="{{APP_IMAGE_PATH}}/<%=img%>" alt="<%=imgAlt%>">
+				  	<img class="responsive-img" src="{{APP_IMAGE_PATH}}/<%=img%>" alt="<%=imgAlt%>">
 				</div>
 		<%}%>
 		
 
 		<section>
 			<% content.forEach(parrafo=>{%>
-			<p style="text-align:justify;"><%=parrafo%></p>
+			<p style="text-align:left;"><%=parrafo%></p>
 		<%});%>
 		</section>
 		

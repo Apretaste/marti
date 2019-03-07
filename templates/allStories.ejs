@@ -1,6 +1,6 @@
 <div class="row">
 	<div class="col s12">
-		<h4>Noticias de hoy</h4>
+		<h1>Noticias de hoy</h1>
 	</div>
 
 <ul class="collection">	
@@ -14,8 +14,10 @@
 			<small>
 			<%if(article.author!=""){%>
 				<%=article.author+", "%>
+				<br>
 			<%}%>
-			<%=article.pubDate.%>
+			
+			<%=article.pubDate%>
 			<br>
 			<%article.category.forEach(category =>{%>
 			<div class= "chip small">

@@ -239,10 +239,14 @@
 				if (strtoupper($pieces[0]) != "A") return;
 
 				// get all other parameters
+				
 				$title = $item->filter('title')->text();
 				$description = $item->filter('description')->text();
 				$pubDate = $item->filter('pubDate')->text();
-				
+				$lenguaje = 'es_ES.UTF-8';
+       			putenv("LANG=$lenguaje");
+				setlocale(LC_ALL, $lenguaje);
+				$pubDate = strftime("%a, %d de %B del %Y. %r",strtotime($pubDate)); // date_format((new DateTime($pubDate)),'d/m/Y h:i a');
 				$category = array();
 				$item->filter('category')->each(function($cate) use(&$category) {
 					if ($cate->text()!="Titulares" && !in_array($cate->text(),$category)) $category[]= $cate->text();

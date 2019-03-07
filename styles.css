@@ -6,3 +6,19 @@
     line-height: 20px;
     padding: 0 8px;
 }
+.collection, .collection-item {
+    border: 1px solid #F8F8F8;
+}
+.collection {
+    border-top: none;
+    border-bottom: none;
+}
+.collection-item:first-of-type {
+    border-top: none;
+}
+.collection-item:last-of-type {
+    border-bottom: none;
+}
+.responsive-img {
+    width: 100%;
+}
