@@ -8,6 +8,7 @@
 }
 .collection, .collection-item {
     border: 1px solid #F8F8F8;
+  
 }
 .collection {
     border-top: none;
@@ -22,3 +23,40 @@
 .responsive-img {
     width: 100%;
 }
+
+.collection-item {
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+}
+#article > * {
+    padding-left: 2px !important;
+    padding-right: 2px !important;
+}
+
+#logo {
+    max-height: 30px;
+    width: auto;
+    line-height: 0px;
+    position: RELATIVE;
+    bottom: -5px;
+}
+
+#footer {
+    padding:20px 0px; 
+    margin-top:20px;
+}
+
+.row{
+  margin-bottom: 0px;
+}
+
+.divider {
+  height: 3px;
+}
+
+#categoria-servicio{
+  position: absolute;
+  right: 12px;
+  bottom: 0px;
+}
+.relative{position: relative;}

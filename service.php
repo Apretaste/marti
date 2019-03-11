@@ -11,11 +11,10 @@
 		 * */
 		public function _main(Request $request, Response $response)
 		{
-			
+			$pathToService = Utils::getPathToService($response->serviceName);
 			$response->setCache("day");
-			//$response->setLayout('marti.tpl');allStories
-			//die(var_dump($this->allStories()));
-			$response->setTemplate("allStories.ejs", $this->allStories());
+			$response->setLayout('marti.ejs');			
+			$response->setTemplate("allStories.ejs", $this->allStories(), ["$pathToService/images/marti-logo.png"]);
 			
 		}
 
@@ -58,7 +57,8 @@
         
 		$responseContent = [
 			"articles" => $articles,
-			"search" => $isCategory ? "Categoria: $buscar" : "Buscar: $buscar"
+			"type" => $isCategory ? "Categoria: " : "Buscar: ",
+			"search" => $buscar
 		];
 
 		$response->setLayout('marti.ejs');
@@ -75,7 +75,7 @@
 		 * */
 		public function _historia(Request $request, Response $response)
 		{ 
-			$history=$request->input->data->historia;
+			$history = $request->input->data->historia;
 
 			// get the pieces
 			$pieces = explode("/", $history);
@@ -87,20 +87,22 @@
 
 			// get the image if exist
 			$images = array();
-			if( ! empty($responseContent['img']))
-			{
-				$images = array($responseContent['img']);
-			}
+			if( ! empty($responseContent['img'])) $images = array($responseContent['img']);
 
 			// subject chenges when user comes from the main menu or from buscar
 			if(strlen($pieces[1]) > 5) $subject = str_replace("-", " ", ucfirst($pieces[1]));
 			else $subject = "La historia que pidio";
 
+			if(isset($request->input->data->busqueda)) 
+				$responseContent['backButton'] = "{'command':'MARTI BUSCAR', 'data':{'searchQuery':'{$request->input->data->busqueda}'}}";
+			else
+				$responseContent['backButton'] = "{'command':'MARTI'}";
+
 			
 			$response->setCache();
-//			$response->setEmailLayout('marti.tpl');
+			$response->setLayout('marti.ejs');
 			$response->setTemplate("story.ejs", $responseContent, $images);
-			return $response;
+			
 		}
 
 		/**
@@ -243,10 +245,10 @@
 				$title = $item->filter('title')->text();
 				$description = $item->filter('description')->text();
 				$pubDate = $item->filter('pubDate')->text();
-				$lenguaje = 'es_ES.UTF-8';
-       			putenv("LANG=$lenguaje");
-				setlocale(LC_ALL, $lenguaje);
-				$pubDate = strftime("%a, %d de %B del %Y. %r",strtotime($pubDate)); // date_format((new DateTime($pubDate)),'d/m/Y h:i a');
+				setlocale(LC_ALL, 'es_ES.UTF-8');
+				$fecha = strftime("%B %d, %Y.",strtotime($pubDate)); 
+				$hora = date_format((new DateTime($pubDate)),'h:i a');
+				$pubDate = $fecha." ".$hora;
 				$category = array();
 				$item->filter('category')->each(function($cate) use(&$category) {
 					if ($cate->text()!="Titulares" && !in_array($cate->text(),$category)) $category[]= $cate->text();
@@ -262,7 +264,8 @@
 				$categoryLink = array();
 				foreach ($category as $currCategory) $categoryLink[] = $currCategory;
 
-				if(count(array_intersect(["OCB Direct Packages", "OCB Direct Programs"], $category))==0)
+				//if(count(array_intersect(["OCB Direct Packages", "OCB Direct Programs"], $category))==0)
+				if(stripos(implode($category), "OCB")==false)
 					$articles[] = array(
 						"title" => $title,
 						"link" => $link,

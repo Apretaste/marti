@@ -1,0 +1,29 @@
+<!-- MENU -->
+
+<div class="row">
+    <div class="col s12 flow-text relative">
+        <a href="#home" onclick="apretaste.send({'command':'MARTI'})">
+            <img id="logo" class="responsive-img" src="{{APP_SERVICE_PATH}}/images/marti-logo.png">
+        </a>
+        <i><small class="grey-text" id="categoria-servicio">Informativo</small></i>
+        <div class="divider"></div>
+    </div>
+</div>
+
+{{APP_TEMPLATE_CODE}}
+
+<div class="row">
+    <div class="col s12 text-center">
+        <small>Tambien puedes visitar <a href="https://www.radiotelevisionmarti.com/"
+                target="_blank">martinoticias.com</a></small>
+    </div>
+</div>
+
+<!-- FOOTER -->
+<div id="footer" class="row center-align grey lighten-4">
+    Apretaste &copy; <%= (new Date).getFullYear() %>. All rights reserved
+    <br>
+    <a href="#!" onclick="apretaste.send({'command':'SOPORTE'});">Soporte</a>
+    &nbsp;&ndash;&nbsp;
+    <a href="#!" onclick="apretaste.send({'command':'TERMINOS'});">T&eacute;rminos</a>
+</div>
