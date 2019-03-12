@@ -1,6 +1,5 @@
 <div class="row">
 	<div class="col s12">
-		<h1>Noticias de hoy</h1>
 		<ul class="collection">	
 		<% articles.forEach(article =>{%>
 			<li class="collection-item">
@@ -10,12 +9,10 @@
 						<p><%=article.description %></p>
 					<%}%>
 					<small>
-					<%if(article.author!=""){%>
-						<%=article.author+", "%>
-						<br>
-					<%}%>
-					
 					<%=article.pubDate%>
+					<%if(article.author!=""){%>
+						// <i><%=article.author%></i>
+					<%}%>
 					<br>
 					<%article.category.forEach(category =>{%>
 					<div class= "chip small">

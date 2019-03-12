@@ -31,7 +31,7 @@
 			
 			// no allow blank entries
 			if(empty($buscar)){
-			//$response->setLayout('Marti.ejs');
+			$response->setLayout('Marti.ejs');
 			$response->setTemplate('text.ejs', [
 				"title" => "Su busqueda parece estar en blanco",
 				"body" => "debe decirnos sobre que tema desea leer"
@@ -46,7 +46,7 @@
 			if(empty($articles))
 		{
 
-			//$response->setLayout('marti.ejs');
+			$response->setLayout('marti.ejs');
 			$response->setTemplate("text.ejs", [
 				"title" => "Su busqueda parece estar en blanco",
 				"body" => html_entity_decode("Su busqueda no gener&oacute; ning&uacute;n resultado. Por favor cambie los t&eacute;rminos de b&uacute;squeda e intente nuevamente.")
@@ -149,7 +149,6 @@
 			$articles = array();
 			$crawler->filter('.row > .small-thums-list.follow-up-list > li')->each(function($item, $i) use (&$articles)
 			{
-				//if($item->filter('.date')->count()==0) die($item->html());
 				// get data from each row
 				$date = $item->filter('.date')->text();
 				$title = $item->filter('.media-block__title')->text();
@@ -265,7 +264,7 @@
 				foreach ($category as $currCategory) $categoryLink[] = $currCategory;
 
 				//if(count(array_intersect(["OCB Direct Packages", "OCB Direct Programs"], $category))==0)
-				if(stripos(implode($category), "OCB")==false)
+				if(!stripos(implode($category), "OCB") && !stripos(implode($category), "Televisión"))
 					$articles[] = array(
 						"title" => $title,
 						"link" => $link,
