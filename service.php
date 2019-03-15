@@ -27,7 +27,7 @@
 		public function _buscar(Request $request, Response $response)
 		{
 			$buscar = $request->input->data->searchQuery;
-			$isCategory = $request->input->data->isCategory;
+			$isCategory = $request->input->data->isCategory == "true";
 			
 			// no allow blank entries
 			if(empty($buscar)){
