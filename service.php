@@ -79,9 +79,9 @@ class Service
 		// send the actual response
 
 		$responseContent = $this->story($history);
-		//die(var_dump($responseContent));
-
-		if (empty(responseContent["content"])) {
+		
+       // filter notices without content
+		if (empty($responseContent['content'])) {
 
 			$response->setLayout('marti.ejs');
 			$response->setTemplate("text.ejs", [
