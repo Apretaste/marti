@@ -26,7 +26,7 @@
 		 * */
 		public function _buscar(Request $request, Response $response)
 		{
-			$buscar = $request->input->data->searchQuery;
+			$buscar = $request->input->data->busqueda;
 			$isCategory = $request->input->data->isCategory == "true";
 			
 			// no allow blank entries
@@ -94,7 +94,7 @@
 			else $subject = "La historia que pidio";
 
 			if(isset($request->input->data->busqueda)) 
-				$responseContent['backButton'] = "{'command':'MARTI BUSCAR', 'data':{'searchQuery':'{$request->input->data->busqueda}'}}";
+				$responseContent['backButton'] = "{'command':'MARTI BUSCAR', 'data':{'busqueda':'{$request->input->data->busqueda}'}}";
 			else
 				$responseContent['backButton'] = "{'command':'MARTI'}";
 
@@ -142,20 +142,23 @@
 		private function searchArticles($query)
 		{
 			// Setup crawler
+		
 			$client = new Client();
 			$url = "http://www.martinoticias.com/s?k=".urlencode($query)."&tab=news&pi=1&r=any&pp=50";
 			$crawler = $client->request('GET', $url);
 			// Collect saearch by category
 			$articles = array();
-			$crawler->filter('.row > .small-thums-list.follow-up-list > li')->each(function($item, $i) use (&$articles)
+			$crawler->filter('.small-thumbs-list > .col-xs-12 > .media-block >.content')->each(function($item, $i) use (&$articles)
 			{
 				// get data from each row
+				
 				$date = $item->filter('.date')->text();
 				$title = $item->filter('.media-block__title')->text();
 				$description = $item->filter('a p')->count()>0 ? $item->filter('a p')->text():"";
 				$link = $item->filter('a')->attr("href");
 
 				// store list of articles
+
 				$articles[] = array(
 					"pubDate" => $date,
 					"description" => $description,

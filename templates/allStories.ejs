@@ -16,7 +16,7 @@
 					<br>
 					<%article.category.forEach(category =>{%>
 					<div class= "chip small">
-					<a class="grey-text text-darken-3" onclick="apretaste.send({'command':'MARTI BUSCAR','data':{'searchQuery':'<%=category%>', 'isCategory':true}})"><%=category%></a>
+					<a class="grey-text text-darken-3" onclick="apretaste.send({'command':'MARTI BUSCAR','data':{'busqueda':'<%=category%>', 'isCategory':true}})"><%=category%></a>
 					</div>
 					<%});%>
 					</small>

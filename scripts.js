@@ -8,7 +8,7 @@ function sendSearch() {
   if(query.length >= 2){
       apretaste.send({
           'command':'MARTI BUSCAR',
-          'data':{'searchQuery' : query, 'isCategory':false}
+          'data':{'busqueda' : query, 'isCategory':false}
       });
   }
     else
