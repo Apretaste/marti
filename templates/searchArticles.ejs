@@ -2,7 +2,7 @@
 	<div class="col s12">
 		<h1><%=type+search%></h1>
 		<ul class="collection">	
-			<% articles.forEach(article =>{%>
+			<% articles.forEach(function(article){%>
 				<li class="collection-item">
 					<%if (article.description.length>200) article.description=article.description.slice(0,200)+"..."%>
 						<a onclick="apretaste.send({'command':'MARTI HISTORIA','data':{'historia':'<%=article.link%>', 'busqueda':'<%=search%>'}})"><h6><b><%=article.title.toUpperCase()%></b></h6></a>

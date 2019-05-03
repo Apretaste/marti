@@ -1,7 +1,7 @@
 <div class="row">
 	<div class="col s12">
 		<ul class="collection">	
-		<% articles.forEach(article =>{%>
+		<% articles.forEach(function(article){%>
 			<li class="collection-item">
 				<%if (article.description.length>200) article.description=article.description.slice(0,200)+"..."%>
 					<a onclick="apretaste.send({'command':'MARTI HISTORIA','data':{'historia':'<%=article.link%>'}})"><h6><b><%=article.title.toUpperCase()%></b></h6></a>
@@ -14,7 +14,7 @@
 					&bull; <i><%=article.author%></i>
 					<%}%>
 					<br>
-					<%article.category.forEach(category =>{%>
+					<%article.category.forEach(function(category){%>
 					<div class= "chip small">
 					<a class="grey-text text-darken-3" onclick="apretaste.send({'command':'MARTI BUSCAR','data':{'busqueda':'<%=category%>', 'isCategory':true}})"><%=category%></a>
 					</div>
