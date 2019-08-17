@@ -1,27 +1,30 @@
 <div class="row">
 	<div class="col s12">
-		<ul class="collection">	
-		<% articles.forEach(function(article){%>
+		<ul class="collection">
+		<% for (var i = 0; i < articles.length; i++) { var article = articles[i]; %>
 			<li class="collection-item">
-				<%if (article.description.length>200) article.description=article.description.slice(0,200)+"..."%>
-					<a onclick="apretaste.send({'command':'MARTI HISTORIA','data':{'historia':'<%=article.link%>'}})"><h6><b><%=article.title.toUpperCase()%></b></h6></a>
-					<%if(article.description.length!=0){%>
-						<p><%=article.description %></p>
-					<%}%>
+				<% if (article.description.length > 200)
+					article.description = article.description.slice(0,200) + "..."; %>
+					<a onclick="apretaste.send({'command':'MARTI HISTORIA','data':{'historia':'<%= article.link %>'}})">
+						<h6><b><%= article.title.toUpperCase() %></b></h6>
+					</a>
+					<% if (article.description.length != 0) {%>
+						<p><%= article.description %></p>
+					<% } %>
 					<small>
-					<%=article.pubDate%>
-					<%if(article.author!=""){%>
-					&bull; <i><%=article.author%></i>
-					<%}%>
+					<%= article.pubDate %>
+					<% if(article.author!="") { %>
+					&bull; <i><%=article.author %></i>
+					<% } %>
 					<br>
-					<%article.category.forEach(function(category){%>
-					<div class= "chip small">
-					<a class="grey-text text-darken-3" onclick="apretaste.send({'command':'MARTI BUSCAR','data':{'busqueda':'<%=category%>', 'isCategory':true}})"><%=category%></a>
-					</div>
-					<%});%>
+					<% for(var j=0; j< article.category.length; j++) { var category = article.category[j]; %>
+                        <div class= "chip small">
+                        <a class="grey-text text-darken-3" onclick="apretaste.send({'command':'MARTI BUSCAR','data':{'busqueda':'<%=category%>', 'isCategory':true}})"><%=category%></a>
+                        </div>
+					<%}%>
 					</small>
 			</li>
-		<%});%>
+		<%}%>
 		</ul>
 		</div>
 		<div class = "fixed-action-btn">

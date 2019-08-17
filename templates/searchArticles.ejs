@@ -1,19 +1,19 @@
 <div class="row">
 	<div class="col s12">
-		<h1><%=type+search%></h1>
-		<ul class="collection">	
-			<% articles.forEach(function(article){%>
-				<li class="collection-item">
-					<%if (article.description.length>200) article.description=article.description.slice(0,200)+"..."%>
-						<a onclick="apretaste.send({'command':'MARTI HISTORIA','data':{'historia':'<%=article.link%>', 'busqueda':'<%=search%>'}})"><h6><b><%=article.title.toUpperCase()%></b></h6></a>
-						<%if(article.description.length!=0){%>
-							<p><%=article.description %></p>
-						<%}%>
+		<h1><%= type + search %></h1>
+		<ul class = "collection">
+			<% for(var i = 0; i < articles.length; i++) { var article = articles[i]; %>
+				<li class = "collection-item">
+					<% if (article.description.length>200) article.description = article.description.substr(0, 200) + "..."; %>
+						<a onclick="apretaste.send({'command':'MARTI HISTORIA','data':{'historia':'<%=article.link%>', 'busqueda':'<%=search%>'}})"><h6><b><%= article.title.toUpperCase() %></b></h6></a>
+						<% if( article.description.length != 0) {%>
+							<p><%= article.description %></p>
+						<% } %>
 						<small>
-							<%=article.pubDate%>
+							<%= article.pubDate %>
 						</small>
 				</li>
-			<%});%>
+			<% } %>
 		</ul>
 		<div class="fixed-action-btn">
 			<a class="btn-floating btn-large waves-effect waves-light green" href="#!" onclick="apretaste.send({'command':'MARTI'})"><i class="material-icons">arrow_back</i></a>
