@@ -1,4 +1,5 @@
 <?php
+
 use Goutte\Client;
 
 class Service
@@ -314,7 +315,7 @@ class Service
 				// get the image
 				if (!empty($imgUrl)) {
 						$imgName = Utils::generateRandomHash() . "." . pathinfo($imgUrl, PATHINFO_EXTENSION);
-						$img = \Phalcon\DI\FactoryDefault::getDefault()->get('path')['root'] . "/temp/$imgName";
+						$img = Utils::getTempDir() . "/$imgName";
 						file_put_contents($img, file_get_contents($imgUrl));
 					}
 			}
