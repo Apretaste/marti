@@ -44,15 +44,14 @@ class Service
 
 		// error if the searche return empty
 		if (empty($articles)) {
-
-				$response->setLayout('marti.ejs');
-				$response->setTemplate("text.ejs", [
+			$response->setLayout('marti.ejs');
+			$response->setTemplate("text.ejs", [
 					"title" => "Su busqueda parece estar en blanco",
 					"body" => html_entity_decode("Su busqueda no gener&oacute; ning&uacute;n resultado. Por favor cambie los t&eacute;rminos de b&uacute;squeda e intente nuevamente.")
 				]);
 
-				return;
-			}
+			return;
+		}
 
 		$responseContent = [
 			"articles" => $articles,
@@ -80,10 +79,9 @@ class Service
 		// send the actual response
 
 		$responseContent = $this->story($history);
-		
-       // filter notices without content
-		if (empty($responseContent['content'])) {
 
+		// filter notices without content
+		if (empty($responseContent['content'])) {
 			$response->setLayout('marti.ejs');
 			$response->setTemplate("text.ejs", [
 				"title" => "Esta noticia solo contiene un archivo de audio o video",
@@ -92,21 +90,29 @@ class Service
 		} else {
 			// get the image if exist
 			$images = array();
-			if (!empty($responseContent['img'])) $images = array($responseContent['img']);
+			if (!empty($responseContent['img'])) {
+				$images = array($responseContent['img']);
+			}
 
 			// subject chenges when user comes from the main menu or from buscar
-			if (strlen($pieces[1]) > 5) $subject = str_replace("-", " ", ucfirst($pieces[1]));
-			else $subject = "La historia que pidio";
+			if (strlen($pieces[1]) > 5) {
+				$subject = str_replace("-", " ", ucfirst($pieces[1]));
+			} else {
+				$subject = "La historia que pidio";
+			}
 
-			if (isset($request->input->data->busqueda))
+			if (isset($request->input->data->busqueda)) {
 				$responseContent['backButton'] = "{'command':'MARTI BUSCAR', 'data':{'busqueda':'{$request->input->data->busqueda}'}}";
-			else
+			} else {
 				$responseContent['backButton'] = "{'command':'MARTI'}";
+			}
 
 
 			$response->setCache();
 			$response->setLayout('marti.ejs');
 			$response->setTemplate("story.ejs", $responseContent, $images);
+
+			Challenges::complete('read-marti', $request->person->id);
 		}
 	}
 
@@ -119,12 +125,11 @@ class Service
 	public function _categoria(Request $request, Response $response)
 	{
 		if (empty($request->query)) {
-
-				$response->setCache();
-				$response->setLayout('marti.tpl');
-				$response->createFromText("Su busqueda parece estar en blanco, debe decirnos sobre que categor&iacute;a desea leer");
-				return $response;
-			}
+			$response->setCache();
+			$response->setLayout('marti.tpl');
+			$response->createFromText("Su busqueda parece estar en blanco, debe decirnos sobre que categor&iacute;a desea leer");
+			return $response;
+		}
 
 		$responseContent = array(
 			"articles" => $this->listArticles($request->query)["articles"],
@@ -191,24 +196,24 @@ class Service
 			// if category matches, add to list of articles
 			$item->filter('category')->each(function ($cat, $i) use (&$articles, $query, $item) {
 				if (strtoupper($cat->text()) == strtoupper($query)) {
-						$title = $item->filter('title')->text();
-						$link = $this->urlSplit($item->filter('link')->text());
-						$pubDate = $item->filter('pubDate')->text();
-						$description = $item->filter('description')->text();
-						$author = "desconocido";
-						if ($item->filter('author')->count() > 0) {
-								$authorString = explode(" ", trim($item->filter('author')->text()));
-								$author = substr($authorString[1], 1, strpos($authorString[1], ")") - 1) . " ({$authorString[0]})";
-							}
+					$title = $item->filter('title')->text();
+					$link = $this->urlSplit($item->filter('link')->text());
+					$pubDate = $item->filter('pubDate')->text();
+					$description = $item->filter('description')->text();
+					$author = "desconocido";
+					if ($item->filter('author')->count() > 0) {
+						$authorString = explode(" ", trim($item->filter('author')->text()));
+						$author = substr($authorString[1], 1, strpos($authorString[1], ")") - 1) . " ({$authorString[0]})";
+					}
 
-						$articles[] = array(
+					$articles[] = array(
 							"title" => $title,
 							"link" => $link,
 							"pubDate" => $pubDate,
 							"description" => $description,
 							"author" => $author
 						);
-					}
+				}
 			});
 		});
 
@@ -238,7 +243,9 @@ class Service
 
 			// do not show anything other than content
 			$pieces = explode("/", $link);
-			if (strtoupper($pieces[0]) != "A") return;
+			if (strtoupper($pieces[0]) != "A") {
+				return;
+			}
 
 			// get all other parameters
 
@@ -251,20 +258,25 @@ class Service
 			$pubDate = $fecha . " " . $hora;
 			$category = array();
 			$item->filter('category')->each(function ($cate) use (&$category) {
-				if ($cate->text() != "Titulares" && !in_array($cate->text(), $category)) $category[] = $cate->text();
+				if ($cate->text() != "Titulares" && !in_array($cate->text(), $category)) {
+					$category[] = $cate->text();
+				}
 			});
 
-			if ($item->filter('author')->count() == 0) $author = "";
-			else {
-					$author = trim($item->filter('author')->text());
-					$author = str_replace(['(', ')'], '', substr($author, strpos($author, "(")));
-				}
+			if ($item->filter('author')->count() == 0) {
+				$author = "";
+			} else {
+				$author = trim($item->filter('author')->text());
+				$author = str_replace(['(', ')'], '', substr($author, strpos($author, "(")));
+			}
 
 			$categoryLink = array();
-			foreach ($category as $currCategory) $categoryLink[] = $currCategory;
+			foreach ($category as $currCategory) {
+				$categoryLink[] = $currCategory;
+			}
 
 			//if(count(array_intersect(["OCB Direct Packages", "OCB Direct Programs"], $category))==0)
-			if (!stripos(implode($category), "OCB") && !stripos(implode($category), "Televisión"))
+			if (!stripos(implode($category), "OCB") && !stripos(implode($category), "Televisión")) {
 				$articles[] = array(
 					"title" => $title,
 					"link" => $link,
@@ -274,6 +286,7 @@ class Service
 					"categoryLink" => $categoryLink,
 					"author" => $author
 				);
+			}
 		});
 
 		// return response content
@@ -309,23 +322,23 @@ class Service
 		$imgAlt = "";
 		$img = "";
 		if ($imageObj->count() != 0) {
-				$imgUrl = trim($imageObj->attr("src"));
-				$imgAlt = trim($imageObj->attr("alt"));
+			$imgUrl = trim($imageObj->attr("src"));
+			$imgAlt = trim($imageObj->attr("alt"));
 
-				// get the image
-				if (!empty($imgUrl)) {
-						$imgName = Utils::generateRandomHash() . "." . pathinfo($imgUrl, PATHINFO_EXTENSION);
-						$img = Utils::getTempDir() . "/$imgName";
-						file_put_contents($img, file_get_contents($imgUrl));
-					}
+			// get the image
+			if (!empty($imgUrl)) {
+				$imgName = Utils::generateRandomHash() . "." . pathinfo($imgUrl, PATHINFO_EXTENSION);
+				$img = Utils::getTempDir() . "/$imgName";
+				file_put_contents($img, file_get_contents($imgUrl));
 			}
+		}
 
 		// get the array of paragraphs of the body
 		$paragraphs = $crawler->filter('div.wsw p:not(.ta-c)');
 		$content = array();
 		foreach ($paragraphs as $p) {
-				$content[] = trim($p->textContent);
-			}
+			$content[] = trim($p->textContent);
+		}
 
 		// create a json object to send to the template
 		return array(
@@ -361,4 +374,3 @@ class Service
 		 * @return Respose
 		 */
 }
- 
