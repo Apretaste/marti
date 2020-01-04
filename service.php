@@ -17,17 +17,19 @@ class Service
 	 */
 	public function _main(Request $request, Response &$response)
 	{
-		$pathToService = Utils::getPathToService($response->serviceName);
 		$response->setCache("day");
 		$response->setLayout('marti.ejs');
-		$response->setTemplate("allStories.ejs", $this->allStories(), ["$pathToService/images/marti-logo.png"]);
+		$response->setTemplate("allStories.ejs", $this->allStories(), [__DIR__."/images/marti-logo.png"]);
 	}
 
-		/**
-		 * Call to show the news
-		 *
-		 * @param Request
-		 **/
+	/**
+	 * Call to show the news
+	 *
+	 * @param \Apretaste\Request  $request
+	 * @param \Apretaste\Response $response
+	 *
+	 * @throws \Framework\Alert
+	 */
 	public function _buscar(Request $request, Response &$response)
 	{
 		$buscar = $request->input->data->busqueda;
@@ -70,8 +72,11 @@ class Service
 	/**
 	 * Call to show the news
 	 *
-	 * @param Request
-	 **/
+	 * @param \Apretaste\Request  $request
+	 * @param \Apretaste\Response $response
+	 *
+	 * @throws \Framework\Alert
+	 */
 	public function _historia(Request $request, Response &$response)
 	{
 		$history = $request->input->data->historia;
@@ -122,8 +127,11 @@ class Service
 	/**
 	 * Call list by categoria
 	 *
-	 * @param Request
-	 **/
+	 * @param \Apretaste\Request  $request
+	 * @param \Apretaste\Response $response
+	 *
+	 * @throws \Framework\Alert
+	 */
 	public function _categoria(Request $request, Response &$response)
 	{
 		if (empty($request->query)) {
@@ -295,11 +303,13 @@ class Service
 	}
 
 	/**
-		 * Get an specific news to display
-		 *
-		 * @param String
-		 * @return Array
-		 */
+	 * Get an specific news to display
+	 *
+	 * @param String
+	 *
+	 * @return Array
+	 * @throws \Exception
+	 */
 	private function story($query)
 	{
 		// create a new client
@@ -353,12 +363,12 @@ class Service
 	}
 
 	/**
-		 * Get the link to the news starting from the /content part
-		 *
-		 * @param String
-		 * @return String
-		 * http://www.martinoticias.com/content/blah
-		 */
+	 * Get the link to the news starting from the /content part
+	 *
+	 * @param String
+	 * @return String
+	 * http://www.martinoticias.com/content/blah
+	 */
 	private function urlSplit($url)
 	{
 		$url = explode("/", trim($url));
@@ -367,11 +377,4 @@ class Service
 		unset($url[2]);
 		return implode("/", $url);
 	}
-
-	/**
-		 * Return a generic error email, usually for try...catch blocks
-		 *
-		 * @auhor salvipascual
-		 * @return Respose
-		 */
 }
