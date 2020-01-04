@@ -1,16 +1,21 @@
 <?php
 
 use Goutte\Client;
+use Apretaste\Request;
+use Apretaste\Response;
+use Apretaste\Challenges;
 
 class Service
 {
 	/**
-		 * Function executed when the service is called
-		 *
-		 * @param Request
-		 * @return Response
-		 * */
-	public function _main(Request $request, Response $response)
+	 * Function executed when the service is called
+	 *
+	 * @param \Apretaste\Request  $request
+	 * @param \Apretaste\Response $response
+	 *
+	 * @throws \Framework\Alert
+	 */
+	public function _main(Request $request, Response &$response)
 	{
 		$pathToService = Utils::getPathToService($response->serviceName);
 		$response->setCache("day");
@@ -18,13 +23,12 @@ class Service
 		$response->setTemplate("allStories.ejs", $this->allStories(), ["$pathToService/images/marti-logo.png"]);
 	}
 
-	/**
+		/**
 		 * Call to show the news
 		 *
 		 * @param Request
-		 * @return Response
-		 * */
-	public function _buscar(Request $request, Response $response)
+		 **/
+	public function _buscar(Request $request, Response &$response)
 	{
 		$buscar = $request->input->data->busqueda;
 		$isCategory = $request->input->data->isCategory == "true";
@@ -64,12 +68,11 @@ class Service
 	}
 
 	/**
-		 * Call to show the news
-		 *
-		 * @param Request
-		 * @return Response
-		 * */
-	public function _historia(Request $request, Response $response)
+	 * Call to show the news
+	 *
+	 * @param Request
+	 **/
+	public function _historia(Request $request, Response &$response)
 	{
 		$history = $request->input->data->historia;
 
@@ -117,18 +120,17 @@ class Service
 	}
 
 	/**
-		 * Call list by categoria
-		 *
-		 * @param Request
-		 * @return Response
-		 * */
-	public function _categoria(Request $request, Response $response)
+	 * Call list by categoria
+	 *
+	 * @param Request
+	 **/
+	public function _categoria(Request $request, Response &$response)
 	{
 		if (empty($request->query)) {
 			$response->setCache();
 			$response->setLayout('marti.tpl');
 			$response->createFromText("Su busqueda parece estar en blanco, debe decirnos sobre que categor&iacute;a desea leer");
-			return $response;
+			return;
 		}
 
 		$responseContent = array(
@@ -139,7 +141,6 @@ class Service
 
 		$response->setEmailLayout('marti.tpl');
 		$response->setTemplate("catArticles.tpl", $responseContent);
-		return $response;
 	}
 
 	/**
@@ -328,7 +329,7 @@ class Service
 			// get the image
 			if (!empty($imgUrl)) {
 				$imgName = Utils::generateRandomHash() . "." . pathinfo($imgUrl, PATHINFO_EXTENSION);
-				$img = Utils::getTempDir() . "/$imgName";
+				$img = TEMP_PATH. "/$imgName";
 				file_put_contents($img, file_get_contents($imgUrl));
 			}
 		}
