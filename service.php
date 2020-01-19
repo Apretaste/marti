@@ -5,16 +5,18 @@ use Apretaste\Request;
 use Apretaste\Response;
 use Apretaste\Challenges;
 
-class Service {
+class Service
+{
 	/**
 	 * Function executed when the service is called
 	 *
-	 * @param \Apretaste\Request  $request
+	 * @param \Apretaste\Request $request
 	 * @param \Apretaste\Response $response
 	 *
 	 * @throws \Framework\Alert
 	 */
-	public function _main(Request $request, Response &$response) {
+	public function _main(Request $request, Response &$response)
+	{
 		$response->setCache('day');
 		$response->setLayout('marti.ejs');
 		$response->setTemplate('allStories.ejs', $this->allStories(), [__DIR__.'/images/marti-logo.png']);
@@ -23,21 +25,22 @@ class Service {
 	/**
 	 * Call to show the news
 	 *
-	 * @param \Apretaste\Request  $request
+	 * @param \Apretaste\Request $request
 	 * @param \Apretaste\Response $response
 	 *
 	 * @throws \Framework\Alert
 	 */
-	public function _buscar(Request $request, Response &$response) {
+	public function _buscar(Request $request, Response &$response)
+	{
 		$buscar = $request->input->data->busqueda;
-		$isCategory = $request->input->data->isCategory==='true';
+		$isCategory = $request->input->data->isCategory === 'true';
 
 		// no allow blank entries
 		if (empty($buscar)) {
 			$response->setLayout('Marti.ejs');
 			$response->setTemplate('text.ejs', [
 					'title' => 'Su busqueda parece estar en blanco',
-					'body'  => 'debe decirnos sobre que tema desea leer'
+					'body' => 'debe decirnos sobre que tema desea leer'
 			]);
 
 			return;
@@ -50,7 +53,7 @@ class Service {
 			$response->setLayout('marti.ejs');
 			$response->setTemplate('text.ejs', [
 					'title' => 'Su busqueda parece estar en blanco',
-					'body'  => html_entity_decode('Su busqueda no gener&oacute; ning&uacute;n resultado. Por favor cambie los t&eacute;rminos de b&uacute;squeda e intente nuevamente.')
+					'body' => html_entity_decode('Su busqueda no gener&oacute; ning&uacute;n resultado. Por favor cambie los t&eacute;rminos de b&uacute;squeda e intente nuevamente.')
 			]);
 
 			return;
@@ -58,8 +61,8 @@ class Service {
 
 		$responseContent = [
 				'articles' => $articles,
-				'type'     => $isCategory ? 'Categoria: ':'Buscar: ',
-				'search'   => $buscar
+				'type' => $isCategory ? 'Categoria: ':'Buscar: ',
+				'search' => $buscar
 		];
 
 		$response->setLayout('marti.ejs');
@@ -69,12 +72,13 @@ class Service {
 	/**
 	 * Call to show the news
 	 *
-	 * @param \Apretaste\Request  $request
+	 * @param \Apretaste\Request $request
 	 * @param \Apretaste\Response $response
 	 *
 	 * @throws \Framework\Alert
 	 */
-	public function _historia(Request $request, Response &$response) {
+	public function _historia(Request $request, Response &$response)
+	{
 		$history = $request->input->data->historia;
 
 		// get the pieces
@@ -89,7 +93,7 @@ class Service {
 			$response->setLayout('marti.ejs');
 			$response->setTemplate('text.ejs', [
 					'title' => 'Esta noticia solo contiene un archivo de audio o video',
-					'body'  => 'No podremos mostrársela, por favor intente con otra.'
+					'body' => 'No podremos mostrársela, por favor intente con otra.'
 			]);
 		} else {
 			// get the image if exist
@@ -122,13 +126,13 @@ class Service {
 	/**
 	 * Call list by categoria
 	 *
-	 * @param \Apretaste\Request  $request
+	 * @param \Apretaste\Request $request
 	 * @param \Apretaste\Response $response
 	 *
 	 * @throws \Framework\Alert
 	 */
-	public function _categoria(Request $request, Response &$response) {
-
+	public function _categoria(Request $request, Response &$response)
+	{
 		if (empty($request->input->data->query)) {
 			$response->setCache();
 			$response->setLayout('marti.tpl');
@@ -153,7 +157,8 @@ class Service {
 	 *
 	 * @return array
 	 * */
-	private function searchArticles($query) {
+	private function searchArticles($query)
+	{
 		$url = 'http://www.martinoticias.com/s?k='.urlencode($query).'&tab=news&pi=1&r=any&pp=50';
 		Crawler::start($url);
 
@@ -171,10 +176,10 @@ class Service {
 			// store list of articles
 
 			$articles[] = [
-					'pubDate'     => $date,
+					'pubDate' => $date,
 					'description' => $description,
-					'title'       => $title,
-					'link'        => $link
+					'title' => $title,
+					'link' => $link
 			];
 		});
 
@@ -188,7 +193,8 @@ class Service {
 	 *
 	 * @return array
 	 */
-	private function listArticles($query) {
+	private function listArticles($query)
+	{
 		// Setup crawler
 		Crawler::start('http://www.martinoticias.com/api/epiqq');
 
@@ -198,7 +204,7 @@ class Service {
 			// if category matches, add to list of articles
 			/** @var \Symfony\Component\DomCrawler\Crawler $item */
 			$item->filter('category')->each(function ($cat, $i) use (&$articles, $query, $item) {
-				if (strtoupper($cat->text())===strtoupper($query)) {
+				if (strtoupper($cat->text()) === strtoupper($query)) {
 					$title = $item->filter('title')->text();
 					$link = $this->urlSplit($item->filter('link')->text());
 					$pubDate = $item->filter('pubDate')->text();
@@ -210,11 +216,11 @@ class Service {
 					}
 
 					$articles[] = [
-							'title'       => $title,
-							'link'        => $link,
-							'pubDate'     => $pubDate,
+							'title' => $title,
+							'link' => $link,
+							'pubDate' => $pubDate,
 							'description' => $description,
-							'author'      => $author
+							'author' => $author
 					];
 				}
 			});
@@ -229,7 +235,8 @@ class Service {
 	 *
 	 * @return array
 	 */
-	private function allStories() {
+	private function allStories()
+	{
 		Crawler::start('http://www.martinoticias.com/api/epiqq');
 
 		$articles = [];
@@ -242,7 +249,7 @@ class Service {
 
 			// do not show anything other than content
 			$pieces = explode('/', $link);
-			if (strtoupper($pieces[0])!=='A') {
+			if (strtoupper($pieces[0]) !== 'A') {
 				return;
 			}
 
@@ -257,12 +264,12 @@ class Service {
 			$pubDate = $fecha.' '.$hora;
 			$category = [];
 			$item->filter('category')->each(function ($cate) use (&$category) {
-				if ($cate->text()!='Titulares' && !in_array($cate->text(), $category)) {
+				if ($cate->text() != 'Titulares' && !in_array($cate->text(), $category)) {
 					$category[] = $cate->text();
 				}
 			});
 
-			if ($item->filter('author')->count()==0) {
+			if ($item->filter('author')->count() == 0) {
 				$author = '';
 			} else {
 				$author = trim($item->filter('author')->text());
@@ -277,13 +284,13 @@ class Service {
 			//if(count(array_intersect(["OCB Direct Packages", "OCB Direct Programs"], $category))==0)
 			if (!stripos(implode($category), 'OCB') && !stripos(implode($category), 'Televisión')) {
 				$articles[] = [
-						'title'        => $title,
-						'link'         => $link,
-						'pubDate'      => $pubDate,
-						'description'  => $description,
-						'category'     => $category,
+						'title' => $title,
+						'link' => $link,
+						'pubDate' => $pubDate,
+						'description' => $description,
+						'category' => $category,
 						'categoryLink' => $categoryLink,
-						'author'       => $author
+						'author' => $author
 				];
 			}
 		});
@@ -300,7 +307,8 @@ class Service {
 	 * @return array
 	 * @throws \Exception
 	 */
-	private function story($query) {
+	private function story($query)
+	{
 		Crawler::start("http://www.martinoticias.com/$query");
 
 		// search for title
@@ -315,7 +323,7 @@ class Service {
 		$imgUrl = '';
 		$imgAlt = '';
 		$img = '';
-		if ($imageObj->count()!==0) {
+		if ($imageObj->count() !== 0) {
 			$imgUrl = trim($imageObj->attr('src'));
 			$imgAlt = trim($imageObj->attr('alt'));
 
@@ -336,12 +344,12 @@ class Service {
 
 		// create a json object to send to the template
 		return [
-				'title'   => $title,
-				'intro'   => $intro,
-				'img'     => $img,
-				'imgAlt'  => $imgAlt,
+				'title' => $title,
+				'intro' => $intro,
+				'img' => $img,
+				'imgAlt' => $imgAlt,
 				'content' => $content,
-				'url'     => "http://www.martinoticias.com/$query"
+				'url' => "http://www.martinoticias.com/$query"
 		];
 	}
 
@@ -351,9 +359,10 @@ class Service {
 	 * @param String
 	 *
 	 * @return String
-	 * http://www.martinoticias.com/content/blah
+	 *                http://www.martinoticias.com/content/blah
 	 */
-	private function urlSplit($url) {
+	private function urlSplit($url)
+	{
 		$url = explode('/', trim($url));
 		unset($url[0], $url[1], $url[2]);
 
