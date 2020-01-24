@@ -117,32 +117,6 @@ class Service
 	}
 
 	/**
-		 * Call list by categoria
-		 *
-		 * @param Request
-		 * @return Response
-		 * */
-	public function _categoria(Request $request, Response $response)
-	{
-		if (empty($request->query)) {
-			$response->setCache();
-			$response->setLayout('marti.tpl');
-			$response->createFromText("Su busqueda parece estar en blanco, debe decirnos sobre que categor&iacute;a desea leer");
-			return $response;
-		}
-
-		$responseContent = array(
-			"articles" => $this->listArticles($request->query)["articles"],
-			"category" => $request->query
-		);
-
-
-		$response->setEmailLayout('marti.tpl');
-		$response->setTemplate("catArticles.tpl", $responseContent);
-		return $response;
-	}
-
-	/**
 		 * Search stories
 		 *
 		 * @param String
