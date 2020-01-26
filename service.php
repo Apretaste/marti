@@ -4,6 +4,7 @@ use Framework\Crawler;
 use Apretaste\Request;
 use Apretaste\Response;
 use Apretaste\Challenges;
+use Framework\Utils;
 
 class Service
 {
@@ -302,7 +303,7 @@ class Service
 
 			// get the image
 			if (!empty($imgUrl)) {
-				$imgName = Utils::generateRandomHash().'.'.pathinfo($imgUrl, PATHINFO_EXTENSION);
+				$imgName = Utils::randomHash().'.'.pathinfo($imgUrl, PATHINFO_EXTENSION);
 				$img = TEMP_PATH."/$imgName";
 				file_put_contents($img, Crawler::get($imgUrl));
 			}
