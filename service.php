@@ -103,13 +103,6 @@ class Service
 				$images = [IMG_PATH.'marti/'.$responseContent['img']];
 			}
 
-			// subject chenges when user comes from the main menu or from buscar
-			if (strlen($pieces[1]) > 5) {
-				$subject = str_replace('-', ' ', ucfirst($pieces[1]));
-			} else {
-				$subject = 'La historia que pidio';
-			}
-
 			if (isset($request->input->data->busqueda)) {
 				$responseContent['backButton'] = "{'command':'MARTI BUSCAR', 'data':{'busqueda':'{$request->input->data->busqueda}'}}";
 			} else {
@@ -297,6 +290,7 @@ class Service
 		$imgUrl = '';
 		$imgAlt = '';
 		$img = '';
+		$imgName = '';
 		if ($imageObj->count() !== 0) {
 			$imgUrl = trim($imageObj->attr('src'));
 			$imgAlt = trim($imageObj->attr('alt'));
@@ -320,7 +314,7 @@ class Service
 		return [
 				'title' => $title,
 				'intro' => $intro,
-				'img' => $img,
+				'img' => $imgName,
 				'imgAlt' => $imgAlt,
 				'content' => $content,
 				'url' => "http://www.martinoticias.com/$query"
