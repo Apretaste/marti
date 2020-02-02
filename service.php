@@ -100,7 +100,7 @@ class Service
 			// get the image if exist
 			$images = [];
 			if (!empty($responseContent['img'])) {
-				$images = [$responseContent['img']];
+				$images = [IMG_PATH.'images/'.$responseContent['img']];
 			}
 
 			// subject chenges when user comes from the main menu or from buscar
