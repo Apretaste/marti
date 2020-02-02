@@ -100,7 +100,7 @@ class Service
 			// get the image if exist
 			$images = [];
 			if (!empty($responseContent['img'])) {
-				$images = [IMG_PATH.'images/'.$responseContent['img']];
+				$images = [IMG_PATH.'marti/'.$responseContent['img']];
 			}
 
 			// subject chenges when user comes from the main menu or from buscar
@@ -116,7 +116,7 @@ class Service
 				$responseContent['backButton'] = "{'command':'MARTI'}";
 			}
 
-			//$response->setCache();
+			$response->setCache();
 			$response->setLayout('marti.ejs');
 			$response->setTemplate('story.ejs', $responseContent, $images);
 
