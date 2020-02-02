@@ -304,7 +304,7 @@ class Service
 			// get the image
 			if (!empty($imgUrl)) {
 				$imgName = Utils::randomHash().'.'.pathinfo($imgUrl, PATHINFO_EXTENSION);
-				$img = TEMP_PATH."$imgName";
+				$img = IMG_PATH."marti/$imgName";
 				file_put_contents($img, Crawler::get($imgUrl));
 			}
 		}
