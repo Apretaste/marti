@@ -116,7 +116,7 @@ class Service
 				$responseContent['backButton'] = "{'command':'MARTI'}";
 			}
 
-			$response->setCache();
+			//$response->setCache();
 			$response->setLayout('marti.ejs');
 			$response->setTemplate('story.ejs', $responseContent, $images);
 
