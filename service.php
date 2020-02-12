@@ -100,7 +100,7 @@ class Service
 			// get the image if exist
 			$images = [];
 			if (!empty($responseContent['img'])) {
-				$images = [IMG_PATH.'marti/'.$responseContent['img']];
+				$images = [TEMP_PATH.'cache/'.$responseContent['img']];
 			}
 
 			if (isset($request->input->data->busqueda)) {
@@ -298,7 +298,7 @@ class Service
 			// get the image
 			if (!empty($imgUrl)) {
 				$imgName = Utils::randomHash().'.'.pathinfo($imgUrl, PATHINFO_EXTENSION);
-				$img = IMG_PATH."marti/$imgName";
+				$img = TEMP_PATH."cache/$imgName";
 				file_put_contents($img, Crawler::get($imgUrl));
 			}
 		}
