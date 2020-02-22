@@ -34,7 +34,11 @@ class Service
 	public function _buscar(Request $request, Response &$response)
 	{
 		$buscar = $request->input->data->busqueda;
-		$isCategory = $request->input->data->isCategory === 'true';
+
+		if (!isset($request->input->data->isCategory))
+			$request->input->data->isCategory = false;
+		$isCategory = $request->input->data->isCategory;
+		$isCategory =  $isCategory === true || $isCategory === 'true' || $isCategory === 1;
 
 		// no allow blank entries
 		if (empty($buscar)) {
