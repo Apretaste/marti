@@ -104,7 +104,7 @@ class Service
 			}
 
 			if (isset($request->input->data->busqueda)) {
-				$responseContent['backButton'] = "{'command':'MARTI BUSCAR', 'data':{'busqueda':'{$request->input->data->busqueda}'}}";
+				$responseContent['backButton'] = "{'command':'MARTI BUSCAR', 'data':{'busqueda':'{$request->input->data->busqueda}', isCategory: false}}";
 			} else {
 				$responseContent['backButton'] = "{'command':'MARTI'}";
 			}
