@@ -126,12 +126,12 @@ class Service
 	 * */
 	private function searchArticles($query)
 	{
-		$url = 'http://www.martinoticias.com/s?k='.urlencode($query).'&tab=news&pi=1&r=any&pp=50';
+		$url = 'https://www.radiotelevisionmarti.com/s?k='.urlencode($query).'&tab=news&pi=1&r=any&pp=50';
 		Crawler::start($url);
 
 		// Collect saearch by category
 		$articles = [];
-		Crawler::filter('.small-thumbs-list > .col-xs-12 > .media-block >.content')->each(function ($item, $i) use (&$articles) {
+		Crawler::filter('li.fui-grid__inner > .media-block')->each(function ($item, $i) use (&$articles) {
 			// get data from each row
 
 			/** @var  \Symfony\Component\DomCrawler\Crawler $item */
