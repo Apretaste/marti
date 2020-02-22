@@ -40,8 +40,8 @@ class Service
 		if (empty($buscar)) {
 			$response->setLayout('Marti.ejs');
 			$response->setTemplate('text.ejs', [
-					'title' => 'Su busqueda parece estar en blanco',
-					'body' => 'debe decirnos sobre que tema desea leer'
+					'title' => 'Su b&uacute;squeda parece estar en blanco',
+					'body' => 'Debe decirnos sobre que tema desea leer.'
 			]);
 
 			return;
@@ -53,8 +53,8 @@ class Service
 		if (empty($articles)) {
 			$response->setLayout('marti.ejs');
 			$response->setTemplate('text.ejs', [
-					'title' => 'Su busqueda parece estar en blanco',
-					'body' => html_entity_decode('Su busqueda no gener&oacute; ning&uacute;n resultado. Por favor cambie los t&eacute;rminos de b&uacute;squeda e intente nuevamente.')
+					'title' => 'Su b&uacute;squeda no produjo resultados',
+					'body' => 'Su b&uacute;squeda no gener&oacute; ning&uacute;n resultado. Por favor cambie los t&eacute;rminos de b&uacute;squeda e intente nuevamente.'
 			]);
 
 			return;
