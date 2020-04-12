@@ -229,7 +229,6 @@ class Service
 			$title = $item->filter('title')->text();
 			$description = $item->filter('description')->text();
 			$pubDate = $item->filter('pubDate')->text();
-			setlocale(LC_ALL, 'es_ES.UTF-8');
 			$fecha = strftime('%B %d, %Y.', strtotime($pubDate));
 			$hora = date_format((new DateTime($pubDate)), 'h:i a');
 			$pubDate = $fecha.' '.$hora;
