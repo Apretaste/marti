@@ -201,7 +201,7 @@ class Service
 	private function listArticles($query)
 	{
 		// Setup crawler
-		Crawler::start('http://www.martinoticias.com/api/epiqq');
+		Crawler::start('http://www.radiotelevisionmarti.com/api/epiqq');
 
 		// Collect articles by category
 		$articles = [];
@@ -312,7 +312,7 @@ class Service
 	 */
 	private function story($query)
 	{
-		Crawler::start("http://www.martinoticias.com/$query");
+		Crawler::start("https://www.radiotelevisionmarti.com/a/$query");
 
 		// search for title
 		$title = self::craw(null, '.col-title h1, h1.title');
