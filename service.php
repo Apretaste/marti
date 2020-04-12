@@ -133,7 +133,7 @@ class Service
 	 *
 	 * @return string | \Symfony\Component\DomCrawler\Crawler
 	 */
-	private static function craw(\Symfony\Component\DomCrawler\Crawler $item, $path, $operation = 'text', $argument = null)
+	private static function craw($item, $path, $operation = 'text', $argument = null)
 	{
 		try {
 			if ($item === null) {
