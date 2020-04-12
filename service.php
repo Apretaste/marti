@@ -336,7 +336,7 @@ class Service
 		// build the content
 		$content = [];
 		self::craw(null, 'div.wsw p:not(.ta-c)', 'each', static function ($paragraph) use (&$content) {
-			$content[] = trim($paragraph->textContent);
+			$content[] = trim($paragraph->text());
 		});
 
 		// create a json object to send to the template
